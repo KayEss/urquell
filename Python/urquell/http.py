@@ -1,4 +1,5 @@
 from google.appengine.ext import webapp
+from google.appengine.ext.webapp import template
 from jsonrpc.json import dumps, loads
 from urquell import Responder
 import re
@@ -30,25 +31,23 @@ class Module(object):
         name = "%s/%s.html" % (module.path(), fn.func_name)
         class Describe(webapp.RequestHandler):
             def examples(self, exes):
-                lis = ""
-                for ex in exes:
-                    lis = '%s<li><a href="%s/%s">%s/%s/%s</a></li>' % (
-                        lis, fn.func_name, ex, module.path(), fn.func_name, ex
-                    )
-                if len(lis):
-                    return "<ol>%s</ol>" % lis
-                else:
-                    return ""
+                return template.render('urquell/templates/examples.html', dict(
+                    module = module,
+                    function = fn,
+                    examples = exes
+                ))
             def get(self):
+                form = u'Form here'
                 self.response.headers['Content-Type'] = 'text/html'
                 self.response.out.write("""<html>
                     <head><title>%s</title></head>
                     <body>
                         <h1>%s</h1>%s
+                        <h2>Write</h2>%s
                         <h2>Examples</h1>%s
                     </body>
                 </html>""" % (
-                    fn.func_name, fn.func_name, fn.func_doc, self.examples(exes))
+                    fn.func_name, fn.func_name, fn.func_doc, form, self.examples(exes))
                 )
         Responder.urls.append((name, Describe))
     def meta(self, fn, exes):
