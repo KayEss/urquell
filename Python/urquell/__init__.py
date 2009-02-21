@@ -1,0 +1,4 @@
+
+
+class Responder(object):
+    urls = []

@@ -1,0 +1,4 @@
+#!/bin/bash
+echo http://localhost:5678/
+python ../../google_appengine/dev_appserver.py . -p 5678
+
