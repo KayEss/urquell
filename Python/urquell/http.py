@@ -37,18 +37,12 @@ class Module(object):
                     examples = exes
                 ))
             def get(self):
-                form = u'Form here'
                 self.response.headers['Content-Type'] = 'text/html'
-                self.response.out.write("""<html>
-                    <head><title>%s</title></head>
-                    <body>
-                        <h1>%s</h1>%s
-                        <h2>Write</h2>%s
-                        <h2>Examples</h1>%s
-                    </body>
-                </html>""" % (
-                    fn.func_name, fn.func_name, fn.func_doc, form, self.examples(exes))
-                )
+                self.response.out.write(template.render('urquell/templates/describe.html', dict(
+                    module = module,
+                    function = fn,
+                    examples = self.examples(exes)
+                )))
         Responder.urls.append((name, Describe))
     def meta(self, fn, exes):
         module = self
