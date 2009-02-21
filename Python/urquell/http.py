@@ -71,13 +71,11 @@ class Module(object):
         class Process(webapp.RequestHandler):
             def doapply(self, path):
                 self.response.headers['Content-Type'] = 'text/plain'
-                parts = path.strip(name).split('/')
-                args = []
-                for i in parts:
-                    args.append(resolver_path(str(i)))
-                kwargs = {}
-                for k in self.request.GET:
-                    kwargs[str(k)] = resolver_query(self.request.GET[k])
+                parts = path[len(module.path()) + len(fn.func_name) + 2:].split('/')
+                args = [resolver_path(str(i)) for i in parts]
+                kwargs = dict(
+                    [(str(k), resolver_query(self.request.GET[k])) for k in self.request.GET]
+                )
                 self.response.out.write(dumps(fn(*args, **kwargs)))
             def get(self):
                 if self.request.path.endswith(".json"):
