@@ -4,7 +4,11 @@
         <h1>{{ function.func_name }}</h1>
             {{ function.func_doc }}
         <h2>Write</h2>
-            Form goes here
+            <form action="{{ function.func_name }}.html" method="post">
+                <label for="">Next argument</label>
+                <input type="text" name="argument" />
+                <input type="submit" name="submit" value="Apply" />
+            </form>
         <h2>Examples</h1>
             {{ examples }}
     </body>

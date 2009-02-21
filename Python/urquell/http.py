@@ -43,10 +43,11 @@ class Module(object):
                     function = fn,
                     examples = self.examples(exes)
                 )))
+            def post(self):
+                self.redirect('%s/%s.html' % (fn.func_name, self.request.POST['argument']))
         Responder.urls.append((name, Describe))
     def meta(self, fn, exes):
-        module = self
-        name = "%s/%s.meta" % (module.path(), fn.func_name)
+        name = "%s/%s.meta" % (self.path(), fn.func_name)
         class Meta(webapp.RequestHandler):
             def get(self):
                 self.response.headers['Content-Type'] = 'text/plain'
@@ -70,9 +71,13 @@ class Module(object):
                     [(str(k), resolver_query(self.request.GET[k])) for k in self.request.GET]
                 )
                 self.response.out.write(dumps(fn(*args, **kwargs)))
+            def dobind(self, path):
+                self.response.headers['Location'] = self.request.POST['argument']
             def get(self):
                 if self.request.path.endswith(".json"):
                     self.doapply(self.request.path.rstrip(".json"))
+                elif self.request.path.endswith(".bind"):
+                    self.dobind(self.request.path.rstrip(".bind"))
                 else:
                     self.response.headers['Content-Type'] = 'text/plain'
                     self.response.out.write(dumps("OK"))
