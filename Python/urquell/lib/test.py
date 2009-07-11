@@ -9,4 +9,8 @@ def echo(*args, **kwargs):
 
 def add(a, b):
     """Add two numbers"""
-    return a + b;
+    return a + b
+
+def sub(a, b):
+	"""Subtract one number from another"""
+	return a - b

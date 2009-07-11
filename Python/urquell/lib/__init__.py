@@ -10,3 +10,7 @@ lib.pure(test.echo, [
 lib.pure(test.add, [
     '1/2.json'
 ])
+
+lib.pure(test.sub, [
+	'2/1.json'
+])
