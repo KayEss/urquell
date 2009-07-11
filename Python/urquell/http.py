@@ -11,7 +11,7 @@ FUNCTION = re.compile('^=')
 def resolver_path(value):
     value = urllib.unquote(value)
     if FUNCTION.match(value):
-        value = resolve_function(value)
+        return resolve_function(value)
     elif value.startswith('=='):
         value = value[1:]
 		
@@ -27,7 +27,7 @@ def resolver_query(value):
 def resolve_function(value):
     value = value[1:]
     value = value.replace('http:--','http://').replace('--',' ').replace('-','/').replace(' ','-')
-    return fetch(value).content
+    return loads(fetch(value).content)['value']
 
 class Module(object):
     def __init__(self, smodule, name):
@@ -82,7 +82,7 @@ class Module(object):
                 kwargs = dict(
                     [(str(k), resolver_query(self.request.GET[k])) for k in self.request.GET]
                 )
-                self.response.out.write(dumps(fn(*args, **kwargs)))
+                self.response.out.write(dumps({'value':fn(*args, **kwargs)}))
             def dobind(self, path):
                 self.response.headers['Location'] = self.request.POST['argument']
             def get(self):
