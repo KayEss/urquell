@@ -15,3 +15,5 @@ lib.pure(test.add, [
 lib.pure(test.sub, [
     '2/1.json'
 ])
+
+lib.pure(test.ifn, [])

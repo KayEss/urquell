@@ -17,3 +17,9 @@ def add(a, *b):
 def sub(a, b):
     """Subtract one number from another"""
     return a - b
+
+def ifn(c, t, f):
+    if bool(c):
+        return t
+    else:
+        return f
