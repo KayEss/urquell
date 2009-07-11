@@ -86,6 +86,7 @@ class Module(object):
                     [(str(k), resolver_query(self.request.GET[k])) for k in self.request.GET]
                 )
                 self.response.out.write(dumps({
+                    'name': '%s/%s' % (module.path(), fn.func_name),
                     'args': [u for u, x in call_trace],
                     'value':fn(*args, **kwargs)
                 }))

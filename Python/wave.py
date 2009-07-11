@@ -26,9 +26,9 @@ def OnBlipSubmitted(properties, context):
 
   for url in URIregex.findall(content):
     if url.startswith('http://urquell-fn.appspot.com/'):
-      feedback = bitly(url)
-#      feedback = url.replace('_', '__').replace('/','_s').replace(':', '_c')
-      feedback = u'=%s\nResult: %s' % (feedback, loads(fetch(url).content)['value'])
+      bitly_hash = bitly(url)
+      result = loads(fetch(url).content)
+      feedback = u'\n\nHash: =%s\nName: %s\nArgs: %s\nResult: %s' % (bitly_hash, result['name'], result['args'], result['value'])
   if feedback:
     notify = blip.CreateChild()
     notify.GetDocument().SetText(feedback)
@@ -38,11 +38,11 @@ def Notify(context, text):
   root_wavelet.CreateBlip().GetDocument().SetText(text)
 
 def bitly(url):
-    quoted = urllib.quote(url)
-    request = "http://api.bit.ly/shorten?version=2.0.1&longUrl="
-    request += quoted
-    request += "&login=rburns&apiKey=R_1ece1bb73288d02b25f7613d25ac63ce"
-    return loads(fetch(request).content)['results'][url]['userHash']
+  quoted = urllib.quote(url)
+  request = "http://api.bit.ly/shorten?version=2.0.1&longUrl="
+  request += quoted
+  request += "&login=rburns&apiKey=R_1ece1bb73288d02b25f7613d25ac63ce"
+  return loads(fetch(request).content)['results'][url]['userHash']
 
 if __name__ == '__main__':
   myRobot = robot.Robot(
