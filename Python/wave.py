@@ -5,12 +5,14 @@ from waveapi import robot
 
 def OnRobotAdded(properties, context):
   """Invoked when the robot has been added."""
-  root_wavelet = context.GetRootWavelet()
   Notify(context, "Urquell calling")
 
 def OnBlipSubmitted(properties, context):
   root_wavelet = context.GetRootWavelet()
-  Notify(context, "Blip submitted")
+  blipid = properties['blipId']
+  blip = context.GetBlipById(blipid)
+  content = blip.GetDocument().GetText()
+  Notify(context, "Blipped: %s" % content)
 
 
 def Notify(context, text):
@@ -19,10 +21,12 @@ def Notify(context, text):
 
 
 if __name__ == '__main__':
-  myRobot = robot.Robot('urquell-fn', 
+  myRobot = robot.Robot(
+      'urquell-fn', 
       image_url='http://urquell-fn.appspot.com/icon.png',
-      version='2',
-      profile_url='http://urquell-fn.appspot.com/')
+      version='4',
+      profile_url='http://urquell-fn.appspot.com/'
+  )
   myRobot.RegisterHandler(events.WAVELET_SELF_ADDED, OnRobotAdded)
   myRobot.RegisterHandler(events.BLIP_SUBMITTED, OnBlipSubmitted)
   myRobot.Run()
