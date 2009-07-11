@@ -1,8 +1,11 @@
 application: urquell-fn
-version: 2
+version: 3
 runtime: python
 api_version: 1
 
 handlers:
 - url: /.*
   script: execute.py
+- url: /_wave/*
+  script: wave.py
+
