@@ -24,5 +24,5 @@ if __name__ == '__main__':
       version='2',
       profile_url='http://urquell-fn.appspot.com/')
   myRobot.RegisterHandler(events.WAVELET_SELF_ADDED, OnRobotAdded)
-  myRobot.RegisterHandler(events.WAVELET_BLIP_SUBMITTED, OnBlipSubmitted)
+  myRobot.RegisterHandler(events.BLIP_SUBMITTED, OnBlipSubmitted)
   myRobot.Run()
