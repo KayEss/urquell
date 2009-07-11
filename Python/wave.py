@@ -6,6 +6,7 @@ import re
 from uri_validate import absolute_URI
 URIregex = re.compile(absolute_URI, re.VERBOSE)
 
+from jsonrpc.json import dumps, loads
 from google.appengine.api.urlfetch import fetch
 
 
@@ -22,12 +23,12 @@ def OnBlipSubmitted(properties, context):
   feedback = u''
 
   for url in URIregex.findall(content):
-    if url.startswith('http://urquell-fn.appspot.com/'):	
-      feedback = u'%s\nResult: %s' % (feedback, fetch(url).content)
+    if url.startswith('http://urquell-fn.appspot.com/'):
+      feedback = url.replace('http://','=http:--').replace('/','-')
+      feedback = u'%s\nResult: %s' % (feedback, loads(fetch(url).content)['value'])
   if feedback:
     notify = blip.CreateChild()
     notify.GetDocument().SetText(feedback)
-
 
 def Notify(context, text):
   root_wavelet = context.GetRootWavelet()
