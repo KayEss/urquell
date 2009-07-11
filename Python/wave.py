@@ -24,7 +24,8 @@ def OnBlipSubmitted(properties, context):
 
   for url in URIregex.findall(content):
     if url.startswith('http://urquell-fn.appspot.com/'):
-      feedback = url.replace('_', '__').replace('/','_s').replace(':', '_c')
+      feedback = bitly(url)
+#      feedback = url.replace('_', '__').replace('/','_s').replace(':', '_c')
       feedback = u'=%s\nResult: %s' % (feedback, loads(fetch(url).content)['value'])
   if feedback:
     notify = blip.CreateChild()
@@ -34,6 +35,12 @@ def Notify(context, text):
   root_wavelet = context.GetRootWavelet()
   root_wavelet.CreateBlip().GetDocument().SetText(text)
 
+def bitly(url):
+	request = "http://api.bit.ly/shorten?version=2.0.1&longUrl="
+	request += url
+	request += "&login=rburns&apiKey=R_1ece1bb73288d02b25f7613d25ac63ce"
+	result = loads(fetch(request).content)['value']
+	return result
 
 if __name__ == '__main__':
   myRobot = robot.Robot(
