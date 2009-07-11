@@ -24,9 +24,10 @@ def resolver_path(value):
 def resolver_query(value):
     return value
 
+
 def resolve_function(value):
     value = value[1:]
-    value = value.replace('http:--','http://').replace('--',' ').replace('-','/').replace(' ','-')
+    value = value.replace('_c', ':').replace('_s', '/').replace('__', '_')
     return loads(fetch(value).content)['value']
 
 class Module(object):
