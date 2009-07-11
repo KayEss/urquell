@@ -96,9 +96,9 @@ class Module(object):
                 self.response.headers['Location'] = self.request.POST['argument']
             def get(self):
                 if self.request.path.endswith(".json"):
-                    self.doapply(self.request.path.rstrip(".json"))
+                    self.doapply(self.request.path[:-5])
                 elif self.request.path.endswith(".bind"):
-                    self.dobind(self.request.path.rstrip(".bind"))
+                    self.dobind(self.request.path[:-5])
                 else:
                     self.response.headers['Content-Type'] = 'text/plain'
                     self.response.out.write(dumps("OK"))
