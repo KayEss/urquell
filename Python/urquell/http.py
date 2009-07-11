@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from jsonrpc.json import dumps, loads
@@ -14,7 +15,7 @@ def resolver_path(value):
         return resolve_function(value)
     elif value.startswith('=='):
         value = value[1:]
-		
+
     if value.isdigit():
         return int(value)
     elif REAL.match(value):
@@ -27,8 +28,8 @@ def resolver_query(value):
 
 def resolve_function(value):
     value = value[1:]
-    value = value.replace('_c', ':').replace('_s', '/').replace('__', '_')
-    return loads(fetch(value).content)['value']
+    url = 'http://bit.ly/%s' % value
+    return loads(fetch(url).content)['value']
 
 class Module(object):
     def __init__(self, smodule, name):
