@@ -31,6 +31,7 @@ def resolve_function(value):
     url = 'http://bit.ly/%s' % value
     return (url, loads(fetch(url).content)['value'])
 
+
 class Module(object):
     def __init__(self, smodule, name):
         self.supermodule = smodule
@@ -88,7 +89,8 @@ class Module(object):
                 self.response.out.write(dumps({
                     'name': '%s/%s' % (module.path(), fn.func_name),
                     'args': [u for u, x in call_trace],
-                    'value':fn(*args, **kwargs)
+                    'path': path,
+                    'value': fn(*args, **kwargs),
                 }))
             def dobind(self, path):
                 self.response.headers['Location'] = self.request.POST['argument']
