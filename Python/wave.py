@@ -20,7 +20,9 @@ def OnBlipSubmitted(properties, context):
   feedback = u''
 
   for url in URIregex.findall(content):
-    feedback = u'%s\n%s' % (feedback, url)
+    feedback = u'%s\n=%s' % (feedback,
+	url.replace('-', '--').replace('/', '-')
+    )
   if feedback:
     notify = blip.CreateChild()
     notify.GetDocument().SetText(feedback)
