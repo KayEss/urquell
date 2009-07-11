@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from waveapi import events
 from waveapi import model
 from waveapi import robot
@@ -6,6 +7,7 @@ import re
 from uri_validate import absolute_URI
 URIregex = re.compile(absolute_URI, re.VERBOSE)
 
+import urllib
 from jsonrpc.json import dumps, loads
 from google.appengine.api.urlfetch import fetch
 
@@ -36,15 +38,15 @@ def Notify(context, text):
   root_wavelet.CreateBlip().GetDocument().SetText(text)
 
 def bitly(url):
-	request = "http://api.bit.ly/shorten?version=2.0.1&longUrl="
-	request += url
-	request += "&login=rburns&apiKey=R_1ece1bb73288d02b25f7613d25ac63ce"
-	result = loads(fetch(request).content)['value']
-	return result
+    quoted = urllib.quote(url)
+    request = "http://api.bit.ly/shorten?version=2.0.1&longUrl="
+    request += quoted
+    request += "&login=rburns&apiKey=R_1ece1bb73288d02b25f7613d25ac63ce"
+    return loads(fetch(request).content)['results'][url]['userHash']
 
 if __name__ == '__main__':
   myRobot = robot.Robot(
-      'urquell-fn', 
+      'urquell-fn',
       image_url='http://urquell-fn.appspot.com/assets/icon.jpg',
       version='4',
       profile_url='http://urquell-fn.appspot.com/'
