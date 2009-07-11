@@ -6,6 +6,8 @@ api_version: 1
 handlers:
 - url: /_wave/.*
   script: wave.py
+- url: /assets
+  static_dir: assets
 - url: /.*
   script: execute.py
 

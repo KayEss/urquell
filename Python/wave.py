@@ -25,7 +25,7 @@ def Notify(context, text):
 if __name__ == '__main__':
   myRobot = robot.Robot(
       'urquell-fn', 
-      image_url='http://urquell-fn.appspot.com/icon.png',
+      image_url='http://urquell-fn.appspot.com/icon.jpg',
       version='4',
       profile_url='http://urquell-fn.appspot.com/'
   )
