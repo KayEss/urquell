@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from urllib import quote
 from urquell import execute
 
 
@@ -31,7 +32,7 @@ def ifn(c, t, f):
 
 
 def fn(server, *path):
-    return "http://%s/%s" % (server, '/'.join(path))
+    return "http://%s/%s" % (server, '/'.join([quote(p) for p in path]))
 def bind(f, v):
     return "%s/%s" % (f, v)
 def call_trace(f):
