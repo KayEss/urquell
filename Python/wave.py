@@ -6,6 +6,8 @@ import re
 from uri_validate import absolute_URI
 URIregex = re.compile(absolute_URI, re.VERBOSE)
 
+from google.appengine.api.urlfetch import fetch
+
 
 def OnRobotAdded(properties, context):
   """Invoked when the robot has been added."""
@@ -20,7 +22,9 @@ def OnBlipSubmitted(properties, context):
   feedback = u''
 
   for url in URIregex.findall(content):
-    feedback = u'%s\n=%s' % (feedback,
+    if url.startswith('http://urquell-fn.appspot.com/'):
+      feedback = u'%s\nResult: %s' % (feedback, fetch(url).content)
+    feedback = u'%s\nEmbedded: =%s' % (feedback,
 	url.replace('-', '--').replace('/', '-')
     )
   if feedback:
