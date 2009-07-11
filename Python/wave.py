@@ -1,6 +1,7 @@
 from waveapi import events
 from waveapi import model
 from waveapi import robot
+import re
 
 
 def OnRobotAdded(properties, context):
@@ -12,7 +13,8 @@ def OnBlipSubmitted(properties, context):
   blipid = properties['blipId']
   blip = context.GetBlipById(blipid)
   content = blip.GetDocument().GetText()
-  Notify(context, "Blipped: %s" % content)
+  notify = blip.CreateChild()
+  notify.GetDocument().SetText("Blipped: %s" % content)
 
 
 def Notify(context, text):
