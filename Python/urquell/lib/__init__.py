@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from urquell.http import Module
 import test
 
@@ -12,5 +13,5 @@ lib.pure(test.add, [
 ])
 
 lib.pure(test.sub, [
-	'2/1.json'
+    '2/1.json'
 ])
