@@ -1,7 +1,10 @@
 from waveapi import events
 from waveapi import model
 from waveapi import robot
+
 import re
+from uri_validate import absolute_URI
+URIregex = re.compile(absolute_URI, re.VERBOSE)
 
 
 def OnRobotAdded(properties, context):
@@ -12,9 +15,15 @@ def OnBlipSubmitted(properties, context):
   root_wavelet = context.GetRootWavelet()
   blipid = properties['blipId']
   blip = context.GetBlipById(blipid)
+
   content = blip.GetDocument().GetText()
-  notify = blip.CreateChild()
-  notify.GetDocument().SetText("Blipped: %s" % content)
+  feedback = u''
+
+  for url in URIregex.findall(content):
+    feedback = u'%s\n%s' % (feedback, url)
+  if feedback:
+    notify = blip.CreateChild()
+    notify.GetDocument().SetText(feedback)
 
 
 def Notify(context, text):
