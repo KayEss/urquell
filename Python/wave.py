@@ -22,10 +22,8 @@ def OnBlipSubmitted(properties, context):
   feedback = u''
 
   for url in URIregex.findall(content):
-    if url.startswith('http://urquell-fn.appspot.com/'):
+    if url.startswith('http://urquell-fn.appspot.com/'):	
       feedback = u'%s\nResult: %s' % (feedback, fetch(url).content)
-    feedback = u'%s\nEmbedded: =%s' % (feedback,
-	url.replace('-', '--').replace('/', '-')
     )
   if feedback:
     notify = blip.CreateChild()

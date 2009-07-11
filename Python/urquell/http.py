@@ -4,13 +4,14 @@ from jsonrpc.json import dumps, loads
 from urquell import Responder
 import re, urllib
 
+from google.appengine.api.urlfetch import fetch
 
 REAL = re.compile('^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$')
 FUNCTION = re.compile('^=')
 def resolver_path(value):
     value = urllib.unquote(value)
     if FUNCTION.match(value):
-        return resolve_function(value)
+        value = resolve_function(value)
     elif value.startswith('=='):
         value = value[1:]
 		
@@ -24,7 +25,10 @@ def resolver_query(value):
     return value
 
 def resolve_function(value):
-    pass
+    value = value[1:]
+    value = value.replace('http:--','http://').replace('--',' ').replace('-','/').replace(' ','-')
+#    return value
+    return fetch(value).content
 
 class Module(object):
     def __init__(self, smodule, name):
