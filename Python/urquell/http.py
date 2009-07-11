@@ -27,7 +27,6 @@ def resolver_query(value):
 def resolve_function(value):
     value = value[1:]
     value = value.replace('http:--','http://').replace('--',' ').replace('-','/').replace(' ','-')
-#    return value
     return fetch(value).content
 
 class Module(object):

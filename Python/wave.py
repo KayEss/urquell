@@ -24,7 +24,6 @@ def OnBlipSubmitted(properties, context):
   for url in URIregex.findall(content):
     if url.startswith('http://urquell-fn.appspot.com/'):	
       feedback = u'%s\nResult: %s' % (feedback, fetch(url).content)
-    )
   if feedback:
     notify = blip.CreateChild()
     notify.GetDocument().SetText(feedback)
