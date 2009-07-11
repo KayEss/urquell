@@ -28,7 +28,10 @@ def OnBlipSubmitted(properties, context):
     if url.startswith('http://urquell-fn.appspot.com/'):
       bitly_hash = bitly(url)
       result = loads(fetch(url).content)
-      feedback = u'\n\nHash: =%s\nName: %s\nArgs: %s\nResult: %s' % (bitly_hash, result['name'], result['args'], result['value'])
+      formatted_args = u''
+      for a in result['args']:
+          formatted_args += '%s ' % a 
+      feedback = u'\n\nHash: =%s\nName: %s\nArgs: %s\nResult: %s' % (bitly_hash, result['name'], formatted_args, result['value'])
   if feedback:
     notify = blip.CreateChild()
     notify.GetDocument().SetText(feedback)
