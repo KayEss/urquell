@@ -17,10 +17,10 @@ def resolver_path(value):
         value = value[1:]
 
     if value.isdigit():
-        return int(value)
+        return (value, int(value))
     elif REAL.match(value):
-        return float(value)
-    return value
+        return (value, float(value))
+    return (value, value)
 
 def resolver_query(value):
     return value
@@ -29,7 +29,7 @@ def resolver_query(value):
 def resolve_function(value):
     value = value[1:]
     url = 'http://bit.ly/%s' % value
-    return loads(fetch(url).content)['value']
+    return (url, loads(fetch(url).content)['value'])
 
 class Module(object):
     def __init__(self, smodule, name):
@@ -80,11 +80,15 @@ class Module(object):
             def doapply(self, path):
                 self.response.headers['Content-Type'] = 'text/plain'
                 parts = path[len(module.path()) + len(fn.func_name) + 2:].split('/')
-                args = [resolver_path(str(i)) for i in parts]
+                call_trace = [resolver_path(str(i)) for i in parts]
+                args = [x for u, x in call_trace]
                 kwargs = dict(
                     [(str(k), resolver_query(self.request.GET[k])) for k in self.request.GET]
                 )
-                self.response.out.write(dumps({'value':fn(*args, **kwargs)}))
+                self.response.out.write(dumps({
+                    'args': [u for u, x in call_trace],
+                    'value':fn(*args, **kwargs)
+                }))
             def dobind(self, path):
                 self.response.headers['Location'] = self.request.POST['argument']
             def get(self):
