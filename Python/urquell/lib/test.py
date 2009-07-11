@@ -31,11 +31,14 @@ def ifn(c, t, f):
         return f
 
 
+def path_args(path):
+    return '/'.join([quote(unicode(p)) for p in path])
+
 def fn(server, *path):
-    return "http://%s/%s" % (server, '/'.join([quote(p) for p in path]))
+    return "http://%s/%s" % (server, path_args(path))
 def bind(f, v):
     return "%s/%s" % (f, v)
-def call_trace(f):
-    return execute("%s.json"%f)
-def call(f):
-    return call_trace(f)['value']
+def call_trace(f, *path):
+    return {'value': (f, path)}
+def call(f, *path):
+    return call_trace(f, *path)['value']
