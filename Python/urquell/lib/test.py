@@ -39,6 +39,10 @@ def fn(server, *path):
 def bind(f, v):
     return "%s/%s" % (f, v)
 def call_trace(f, *path):
-    return {'value': (f, path)}
+    if len(path):
+        return execute('%s/%s.json' % (f, path_args(path)))
+    else:
+        return execute('%s.json' % f)
 def call(f, *path):
     return call_trace(f, *path)['value']
+
