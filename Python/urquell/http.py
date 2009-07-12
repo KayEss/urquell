@@ -87,7 +87,7 @@ class Module(object):
         module = self
         name = "%s/%s/.*" % (module.path(), fn.func_name)
         class Process(webapp.RequestHandler):
-            def cache(self,a_url):
+            def store_invocation(self,a_url):
                 def gen_ihash():
                     ihash = os.urandom(16).encode("base64")[:6]
                     invocation = Invocation.gql("WHERE ihash = '%s'" % ihash).fetch(1)
@@ -102,7 +102,7 @@ class Module(object):
                 else:
                     return invocation[0].ihash
             def doapply(self, path):
-                ihash = self.cache(self.request.url)
+                ihash = self.store_invocation(self.request.url)
                 self.response.headers['Content-Type'] = 'text/plain'
                 parts = path[len(module.path()) + len(fn.func_name) + 2:].split('/')
                 call_trace = [resolver_path(str(i)) for i in parts]
