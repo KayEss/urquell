@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
-from google.appengine.ext import db
-from google.appengine.api.urlfetch import fetch
 from google.appengine.api import memcache
 
 from jsonrpc.json import dumps, loads
@@ -78,11 +76,11 @@ class Module(object):
             def dobind(self, path):
                 self.response.headers['Location'] = self.request.POST['argument']
             def get(self):
-                if self.request.path.endswith(".json"):
+                if self.request.path.endswith(".json"): # deprecated
                     self.doapply(self.request.path[:-5])
-                elif self.request.path.endswith(".bind"):
+                elif self.request.path.endswith(".bind"): # deprecated
                     self.dobind(self.request.path[:-5])
                 else:
-                    self.response.headers['Content-Type'] = 'text/plain'
-                    self.response.out.write(dumps("OK"))
+                    # TODO: Output should depend on headers
+                    self.doapply(self.request.path)
         Responder.urls.append((name, Process))

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from google.appengine.ext import db
 from google.appengine.api import memcache
+from google.appengine.api.urlfetch import fetch
 
 from jsonrpc.json import dumps, loads
 
