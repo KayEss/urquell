@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
+from google.appengine.ext import db
 from jsonrpc.json import dumps, loads
 from urquell import Responder
-import re, urllib
+from urquell.invocation import Invocation
+import re, urllib, os
 
 from google.appengine.api.urlfetch import fetch
 
@@ -28,7 +30,10 @@ def resolver_query(value):
 
 def resolve_function(value):
     value = value[1:]
-    url = 'http://bit.ly/%s' % value
+    dest = Invocation.gql("WHERE ihash = '%s'" % value).fetch(1)
+    if not len(dest):
+	    raise Exception("Unable to resolve function invocation. Invocation hash: %s" % value)
+    url = dest[0].url
     return (url, loads(fetch(url).content)['value'])
 
 
@@ -78,7 +83,22 @@ class Module(object):
         module = self
         name = "%s/%s/.*" % (module.path(), fn.func_name)
         class Process(webapp.RequestHandler):
+            def cache(self,a_url):
+                def gen_ihash():
+                    ihash = os.urandom(16).encode("base64")[:6]
+                    invocation = Invocation.gql("WHERE ihash = '%s'" % ihash).fetch(1)
+                    if invocation == False: return gen_ihash()
+                    return ihash
+                invocation = Invocation.gql("WHERE url = '%s'" % a_url).fetch(1)
+                if not len(invocation): 
+                    ihash = gen_ihash()
+                    invocation = Invocation(ihash=ihash,url=a_url)
+                    db.put(invocation)
+                    return ihash
+                else:
+                    return invocation[0].ihash
             def doapply(self, path):
+                ihash = self.cache(self.request.url)
                 self.response.headers['Content-Type'] = 'text/plain'
                 parts = path[len(module.path()) + len(fn.func_name) + 2:].split('/')
                 call_trace = [resolver_path(str(i)) for i in parts]
@@ -86,7 +106,9 @@ class Module(object):
                 kwargs = dict(
                     [(str(k), resolver_query(self.request.GET[k])) for k in self.request.GET]
                 )
+				# memcached results handling
                 self.response.out.write(dumps({
+                    'hash': u'=%s' % unicode(ihash),
                     'name': '%s/%s' % (module.path(), fn.func_name),
                     'args': [u for u, x in call_trace],
                     'path': path,
