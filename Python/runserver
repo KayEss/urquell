@@ -1,2 +1,2 @@
 #!/bin/bash
-python ../../google_appengine/dev_appserver.py . -a `hostname -f` -p 5678
+python2.5 ../../google_appengine/dev_appserver.py . -a `hostname -f` -p 5678
