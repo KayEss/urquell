@@ -13,6 +13,17 @@ class Module(object):
     def __init__(self, smodule, name):
         self.supermodule = smodule
         self.name = name
+        self.submodules = []
+        self.functions = []
+        if self.supermodule:
+            self.supermodule.submodules.append(self)
+        Responder.modules[self.path()] = self
+        class Describe(webapp.RequestHandler):
+            def get(describer):
+                describer.response.out.write(template.render('urquell/templates/module.html', dict(
+                    module = self
+                )))
+        Responder.urls.append(('%s/$' % self.path(), Describe))
     def path(self):
         if self.supermodule:
             return "%s/%s" % ( self.supermodule.path(), self.name )
@@ -29,7 +40,6 @@ class Module(object):
                     examples = exes
                 ))
             def get(self):
-                self.response.headers['Content-Type'] = 'text/html'
                 self.response.out.write(template.render('urquell/templates/describe.html', dict(
                     module = module,
                     function = fn,
@@ -50,6 +60,7 @@ class Module(object):
                 }))
         Responder.urls.append((name, Meta))
     def pure(self, fn, examples = []):
+        self.functions.append(fn)
         self.describe(fn, examples)
         self.meta(fn, examples)
         module = self

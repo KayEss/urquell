@@ -1,0 +1,20 @@
+{%extends 'skin.html'%}
+
+{% block content %}
+
+    <h1>{{ module.name }}</h1>
+
+    {% if module.submodules %}
+        <h2>Modules</h2>
+    {% endif %}
+
+    {% if module.functions %}
+        <h2>Functions</h2>
+        <ul>
+            {% for function in module.functions %}
+                <li><a href="{{ function.func_name }}.html">{{ function.func_name }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+{% endblock %}

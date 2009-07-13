@@ -1,15 +1,12 @@
-<html>
-    <head><title>{{ function.func_name }} &mdash; {{ module.path }}</title></head>
-    <body>
-        <h1>{{ function.func_name }}</h1>
-            {{ function.func_doc }}
-        <h2>Write</h2>
-            <form action="{{ function.func_name }}.html" method="post">
-                <label for="">Next argument</label>
-                <input type="text" name="argument" />
-                <input type="submit" name="submit" value="Apply" />
-            </form>
-        <h2>Examples</h1>
-            {{ examples }}
-    </body>
-</html>
+{%extends 'skin.html'%}
+
+{% block content %}
+
+    <h1>{{ function.func_name }}</h1>
+        {{ function.func_doc }}
+    <h2>Result</h2>
+    <h2>Write</h2>
+    <h2>Examples</h1>
+        {{ examples }}
+
+{% endblock %}

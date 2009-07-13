@@ -11,7 +11,7 @@ def echo(*args, **kwargs):
         'arguments': args,
         'keywords': kwargs,
     }
-lib.pure(test.echo, [
+lib.pure(echo, [
     '23/231.123123?hello=country&goodbye=nightclub',
     'hello%20country,%20goodbye%20nightclub',
 ])
@@ -21,7 +21,7 @@ def add(a, *b):
     for v in b:
         a = a + v
     return a
-lib.pure(test.add, [
+lib.pure(add, [
     '1/2',
 ])
 def sub(a, *b):
@@ -30,7 +30,7 @@ def sub(a, *b):
         a = a - v
     return a
     return a - b
-lib.pure(test.sub, [
+lib.pure(sub, [
     '2/1',
 ])
 def mul(a, *b):
@@ -38,7 +38,7 @@ def mul(a, *b):
     for v in b:
         a = a * v
     return a
-lib.pure(test.mul, [
+lib.pure(mul, [
     '2/1',
 ])
 def div(a, *b):
@@ -46,7 +46,7 @@ def div(a, *b):
     for v in b:
         a = a / v
     return a
-lib.pure(test.div, [
+lib.pure(div, [
     '2/3.0',
     '2/3.0/6',
 ])
@@ -56,20 +56,20 @@ def ifn(c, t, *f):
         return t
     else:
         return f
-lib.pure(test.ifn, [])
+lib.pure(ifn, [])
 
 def path_args(path):
     return '/'.join([quote(unicode(p)) for p in path])
 
 def fn(server, *path):
     return "http://%s/%s" % (server, path_args(path))
-lib.pure(test.fn, [
+lib.pure(fn, [
     'urquell-fn.appspot.com/lib/echo/',
     'urquell-fn.appspot.com/lib/add/1',
 ])
 def bind(f, v):
     return "%s/%s" % (f, v)
-lib.pure(test.bind, [
+lib.pure(bind, [
 ])
 def call_trace(f, *path):
     from urquell import execute
@@ -77,7 +77,7 @@ def call_trace(f, *path):
         return execute('%s/%s' % (f, path_args(path)))
     else:
         return execute(f)
-lib.pure(test.call_trace, [])
+lib.pure(call_trace, [])
 def call(f, *path):
     return call_trace(f, *path)['value']
-lib.pure(test.call, [])
+lib.pure(call, [])
