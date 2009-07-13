@@ -11,6 +11,7 @@ import urllib
 from jsonrpc.json import dumps, loads
 from google.appengine.api.urlfetch import fetch
 
+from urquell import invocation
 
 def OnRobotAdded(properties, context):
   """Invoked when the robot has been added."""
@@ -26,7 +27,7 @@ def OnBlipSubmitted(properties, context):
 
   for url in URIregex.findall(content):
     if url.startswith('http://urquell-fn.appspot.com/'):
-      result = loads(fetch(url).content)
+      result = execute(url);
       formatted_args = u''
       for a in result['args']:
           formatted_args += '%s ' % a
