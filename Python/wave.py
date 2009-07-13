@@ -26,12 +26,11 @@ def OnBlipSubmitted(properties, context):
 
   for url in URIregex.findall(content):
     if url.startswith('http://urquell-fn.appspot.com/'):
-      bitly_hash = bitly(url)
       result = loads(fetch(url).content)
       formatted_args = u''
       for a in result['args']:
           formatted_args += '%s ' % a
-      feedback = u'\n\nHash: =%s\nName: %s\nArgs: %s\nResult: %s' % (bitly_hash, result['name'], formatted_args, result['value'])
+      feedback = u'\n\nHash: %s\nName: %s\nArgs: %s\nResult: %s' % (result['hash'], result['name'], formatted_args, result['value'])
   if feedback:
     notify = blip.CreateChild()
     notify.GetDocument().SetText(feedback)
@@ -39,13 +38,6 @@ def OnBlipSubmitted(properties, context):
 def Notify(context, text):
   root_wavelet = context.GetRootWavelet()
   root_wavelet.CreateBlip().GetDocument().SetText(text)
-
-def bitly(url):
-  quoted = urllib.quote(url)
-  request = "http://api.bit.ly/shorten?version=2.0.1&longUrl="
-  request += quoted
-  request += "&login=rburns&apiKey=R_1ece1bb73288d02b25f7613d25ac63ce"
-  return loads(fetch(request).content)['results'][url]['userHash']
 
 
 def main():
