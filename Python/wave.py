@@ -38,12 +38,11 @@ def handle_exec(blip, content, exec_pos):
   stack_frame = u''
   formatted_args = u''
 
-  url = content[url_pos:exec_pos]
-  result = execute(url)
-  for a in result['args']:
-    formatted_args += '%s ' % a
+  result = execute(content[url_pos:exec_pos])
+  format = u'Hash: %s     Name: %s     Result: %s\nArgs: %s'
+  data = (result['hash'], result['name'], result['value'], ', '.join(result['args']))
+  stack_frame =  format % data 
 
-  stack_frame = u'Hash: %s\nName: %s\nArgs: %s\nResult: %s' % (result['hash'], result['name'], formatted_args, result['value'])
   doc.SetTextInRange(document.Range(url_pos,exec_pos + 2), ('%s\n\n%s' % (stack_frame,result['hash'])))
 
 def handle_desc(blip, content, desc_pos):
