@@ -17,9 +17,9 @@ from urquell.invocation import execute
 def on_robot_added(properties, context):
   """Invoked when the robot has been added."""
   root_wavelet = context.GetRootWavelet()
-  root_wavelet.CreateBlip().GetDocument().SetText("Urquell calling")
+  root_wavelet.CreateBlip().GetDocument().SetText("Urquell calling - !x to execute, !d to describe")
 
-def on_blip_submitted(properties, context):
+def on_document_changed(properties, context):
   blipid = properties['blipId']
   blip = context.GetBlipById(blipid)
   content = blip.GetDocument().GetText()
@@ -53,11 +53,11 @@ def main():
   myRobot = robot.Robot(
       'urquell-fn',
       image_url='http://urquell-fn.appspot.com/assets/icon.jpg',
-      version='4',
+      version='5',
       profile_url='http://urquell-fn.appspot.com/'
   )
   myRobot.RegisterHandler(events.WAVELET_SELF_ADDED, on_robot_added)
-  myRobot.RegisterHandler(events.BLIP_SUBMITTED, on_blip_submitted)
+  myRobot.RegisterHandler(events.DOCUMENT_CHANGED, on_document_changed)
   myRobot.Run()
 
 
