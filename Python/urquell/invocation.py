@@ -33,7 +33,7 @@ def invoke(path, request, module, fn):
         'args': [u for u, x in call_trace],
         'path': path,
         'value': fn(*args, **kwargs),
-        'headers': dict([(k, v) for k, v in request.headers.items()]),
+        'headers': dict([(k, unicode(v)) for k, v in request.headers.items()]),
     }
     json = dumps(object)
     memcache.add(ihash, json, 300)
