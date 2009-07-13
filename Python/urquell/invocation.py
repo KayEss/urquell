@@ -33,6 +33,7 @@ def invoke(path, request, module, fn):
         'args': [u for u, x in call_trace],
         'path': path,
         'value': fn(*args, **kwargs),
+        'headers': dict([(k, v) for k, v in request.headers.items()]),
     }
     json = dumps(object)
     memcache.add(ihash, json, 300)
@@ -41,7 +42,7 @@ def invoke(path, request, module, fn):
 def execute(url):
     if url:
         return loads(fetch(url, headers={
-            'X-Requested-With': 'Urquell XMLHttpRequest',
+            'X-Requested-With': 'XMLHttpRequest',
         }).content)
     else:
         return None

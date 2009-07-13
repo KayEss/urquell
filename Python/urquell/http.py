@@ -49,7 +49,7 @@ class Module(object):
                     invoke(self.request.path[:-5], self.request, module, fn)
                 else:
                     json, obj = invoke(self.request.path, self.request, module, fn)
-                    if self.request.headers.get('HTTP_X_REQUESTED_WITH', '').find('XMLHttpRequest') >= 0:
+                    if self.request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
                         self.response.headers['Content-Type'] = 'text/plain'
                         self.response.out.write(json)
                     else:
