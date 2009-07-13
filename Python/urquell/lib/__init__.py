@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from urquell.http import Module
+from urquell.invocation import path_args
 import test
 
 lib = Module(None, 'lib')
@@ -58,10 +59,9 @@ def ifn(c, t, *f):
         return f
 lib.pure(ifn, [])
 
-def path_args(path):
-    return '/'.join([quote(unicode(p)) for p in path])
 
 def fn(server, *path):
+    """Constructs a function from a server name and a path"""
     return "http://%s/%s" % (server, path_args(path))
 lib.pure(fn, [
     'urquell-fn.appspot.com/lib/echo/',

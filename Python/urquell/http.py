@@ -26,43 +26,12 @@ class Module(object):
         Responder.urls.append(('%s/$' % self.path(), Describe))
     def path(self):
         if self.supermodule:
-            return "%s/%s" % ( self.supermodule.path(), self.name )
+            return "%s/%s" % (self.supermodule.path(), self.name)
         else:
             return "/%s" % self.name
-    def describe(self, fn, exes):
-        module = self
-        name = "%s/%s.html" % (module.path(), fn.func_name)
-        class Describe(webapp.RequestHandler):
-            def examples(self, exes):
-                return template.render('urquell/templates/examples.html', dict(
-                    module = module,
-                    function = fn,
-                    examples = exes
-                ))
-            def get(self):
-                self.response.out.write(template.render('urquell/templates/describe.html', dict(
-                    module = module,
-                    function = fn,
-                    examples = self.examples(exes)
-                )))
-            def post(self):
-                self.redirect('%s/%s.html' % (fn.func_name, self.request.POST['argument']))
-        Responder.urls.append((name, Describe))
-    def meta(self, fn, exes):
-        name = "%s/%s.meta" % (self.path(), fn.func_name)
-        class Meta(webapp.RequestHandler):
-            def get(self):
-                self.response.headers['Content-Type'] = 'text/plain'
-                self.response.out.write(dumps({
-                    'name': fn.func_name,
-                    'path': name,
-                    'examples': exes,
-                }))
-        Responder.urls.append((name, Meta))
+
     def pure(self, fn, examples = []):
         self.functions.append(fn)
-        self.describe(fn, examples)
-        self.meta(fn, examples)
         module = self
         name = "%s/%s/.*" % (module.path(), fn.func_name)
         class Process(webapp.RequestHandler):
@@ -84,14 +53,24 @@ class Module(object):
                 })
                 memcache.add(ihash, json, 300)
                 self.response.out.write(json)
-            def dobind(self, path):
-                self.response.headers['Location'] = self.request.POST['argument']
+            def examples(self, exes):
+                return template.render('urquell/templates/examples.html', dict(
+                    module = module,
+                    function = fn,
+                    examples = exes
+                ))
             def get(self):
                 if self.request.path.endswith(".json"): # deprecated
                     self.doapply(self.request.path[:-5])
                 elif self.request.path.endswith(".bind"): # deprecated
                     self.dobind(self.request.path[:-5])
                 else:
-                    # TODO: Output should depend on headers
-                    self.doapply(self.request.path)
+                    if self.request.headers.get('HTTP_X_REQUESTED_WITH', '').find('XMLHttpRequest') >= 0:
+                        self.doapply(self.request.path)
+                    else:
+                        self.response.out.write(template.render('urquell/templates/describe.html', dict(
+                            module = module,
+                            function = fn,
+                            examples = self.examples(examples)
+                        )))
         Responder.urls.append((name, Process))

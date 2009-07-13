@@ -4,9 +4,21 @@
 
     <h1>{{ function.func_name }}</h1>
         {{ function.func_doc }}
+
     <h2>Result</h2>
+
     <h2>Write</h2>
-    <h2>Examples</h1>
+        <form>
+            <dl>
+                <dt><label for="prefix">Prefix</label></dt>
+                    <dd><input type="text" name="prefix" value="http://urquell-fn.appspot.com/" /></dd>
+                <dt><label for="suffix">Suffix</label></dt>
+                    <dd><input type="text" name="suffix" value="" /></dd>
+            </dl>
+            <input type="submit" value="Create function call" />
+        </form>
+
+    <h2>Examples</h2>
         {{ examples }}
 
 {% endblock %}

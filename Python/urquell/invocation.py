@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import urllib
 from google.appengine.ext import db
 from google.appengine.api import memcache
 from google.appengine.api.urlfetch import fetch
@@ -64,3 +65,6 @@ def resolve_function(value):
     if not json:
         json = fetch(url).content
     return (url, loads(json)['value'])
+
+def path_args(path):
+    return '/'.join([urllib.quote(unicode(p)) for p in path])
