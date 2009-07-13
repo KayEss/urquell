@@ -2,7 +2,9 @@
 import wsgiref.handlers
 from google.appengine.ext import webapp
 from urquell import Responder
+
 import urquell.lib
+import urquell.lib.http
 
 
 def main():
