@@ -14,6 +14,3 @@ class Homepage(webapp.RequestHandler):
 class Responder(object):
     urls = [('^/$', Homepage)]
     modules = {}
-
-def execute(url):
-    return loads(fetch(url).content)

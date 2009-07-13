@@ -19,6 +19,33 @@ class Invocation(db.Model):
   ihash = db.StringProperty(required=True)
   url = db.StringProperty(required=True)
 
+def invoke(path, request, module, fn):
+    ihash = store_invocation(request.url)
+    parts = path[len(module.path()) + len(fn.func_name) + 2:].split('/')
+    call_trace = [resolver_path(str(i)) for i in parts]
+    args = [x for u, x in call_trace]
+    kwargs = dict(
+        [(str(k), resolver_query(request.GET[k])) for k in request.GET]
+    )
+    object = {
+        'hash': u'=%s' % unicode(ihash),
+        'name': '%s/%s' % (module.path(), fn.func_name),
+        'args': [u for u, x in call_trace],
+        'path': path,
+        'value': fn(*args, **kwargs),
+    }
+    json = dumps(object)
+    memcache.add(ihash, json, 300)
+    return json, object
+
+def execute(url):
+    if url:
+        return loads(fetch(url, headers={
+            'X-Requested-With': 'Urquell XMLHttpRequest',
+        }).content)
+    else:
+        return None
+
 def store_invocation(a_url):
     def gen_ihash():
         ihash = os.urandom(16).encode("base64")[:6]
