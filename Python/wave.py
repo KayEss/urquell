@@ -30,7 +30,7 @@ def OnBlipSubmitted(properties, context):
       result = loads(fetch(url).content)
       formatted_args = u''
       for a in result['args']:
-          formatted_args += '%s ' % a 
+          formatted_args += '%s ' % a
       feedback = u'\n\nHash: =%s\nName: %s\nArgs: %s\nResult: %s' % (bitly_hash, result['name'], formatted_args, result['value'])
   if feedback:
     notify = blip.CreateChild()
@@ -47,7 +47,8 @@ def bitly(url):
   request += "&login=rburns&apiKey=R_1ece1bb73288d02b25f7613d25ac63ce"
   return loads(fetch(request).content)['results'][url]['userHash']
 
-if __name__ == '__main__':
+
+def main():
   myRobot = robot.Robot(
       'urquell-fn',
       image_url='http://urquell-fn.appspot.com/assets/icon.jpg',
@@ -57,3 +58,7 @@ if __name__ == '__main__':
   myRobot.RegisterHandler(events.WAVELET_SELF_ADDED, OnRobotAdded)
   myRobot.RegisterHandler(events.BLIP_SUBMITTED, OnBlipSubmitted)
   myRobot.Run()
+
+
+if __name__ == '__main__':
+    main()
