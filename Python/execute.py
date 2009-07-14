@@ -3,6 +3,8 @@ import wsgiref.handlers
 from google.appengine.ext import webapp
 from urquell import Responder
 
+# These lines load the libraries and register the implementations
+import urquell.lib.combinator
 import urquell.lib.http
 
 def main():
