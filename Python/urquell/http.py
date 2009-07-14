@@ -15,8 +15,8 @@ class Module(object):
         self.name = name
         self.submodules = []
         self.functions = []
-        if self.supermodule:
-            self.supermodule.submodules.append(self)
+        if smodule:
+            smodule.submodules.append(self)
         Responder.modules[self.path()] = self
         class Describe(webapp.RequestHandler):
             def get(describer):
