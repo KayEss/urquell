@@ -24,6 +24,7 @@ def add(a, *b):
     return a
 lib.pure(add, [
     '1/2',
+    '1/2/3/4',
 ])
 def sub(a, *b):
     """Subtract one number from another"""
@@ -33,6 +34,7 @@ def sub(a, *b):
     return a - b
 lib.pure(sub, [
     '2/1',
+    '2/1/-1',
 ])
 def mul(a, *b):
     """Multiply a set of numbers together"""
@@ -67,6 +69,7 @@ def fn(server, *path):
     return "http://%s/%s" % (server, path_args(path))
 lib.pure(fn, [
     'urquell-fn.appspot.com/lib/echo/',
+    'urquell-fn.appspot.com/lib/echo/hello/%20/world',
     'urquell-fn.appspot.com/lib/add/1',
 ])
 def bind(f, *path):
