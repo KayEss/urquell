@@ -5,6 +5,7 @@ from urquell import urls
 
 # These lines load the libraries and register the implementations
 import urquell.lib.combinator
+import urquell.lib.json
 import urquell.lib.http
 
 def main():
