@@ -23,10 +23,16 @@ class Responder(webapp.RequestHandler):
 
     def get(self):
         hit = self.hit(self.request.path)
-        response, mime = hit.get(self.request)
-        if mime:
-            self.response.headers['Content-Type'] = mime
-        self.response.out.write(response)
+        if hit:
+            response, mime = hit.get(self.request)
+            if mime:
+                self.response.headers['Content-Type'] = mime
+            self.response.out.write(response)
+        else:
+            self.response.set_status(404)
+            self.response.out.write(template.render('urquell/templates/404.html', dict(
+                path = self.request.path
+            )))
 
 urls = [
     ('^/$', Homepage),
