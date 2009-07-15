@@ -8,15 +8,9 @@
     <h2>Result</h2>
     <dl>
         <dt>Return value</dt>
-            <dd>{{ value }}</dd>
+            <dd>{{ value|escape }}</dd>
         <dt>Binding code</dt>
             <dd>{{ result.hash }}</dd>
-        <dt>Request headers</dt>
-            <dd>
-                {% for i in result.headers %}
-                    {{ i }} -- {{ v }}<br />
-                {% endfor %}
-            </dd>
     </dl>
 
     <!--h2>Write</h2>
