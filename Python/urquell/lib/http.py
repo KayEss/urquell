@@ -16,7 +16,7 @@ def get(url):
     if url:
         response = fetch(url, deadline=10)
         headers = dict([(k, v) for k, v in response.headers.items()])
-        mime, encoding = headers.get('content-type', ';').split(';')[:2]
+        mime, encoding = headers.get('Content-Type', ';').split(';')
         if len(encoding):
             charset = encoding.split('=')[1]
         if mime.startswith('text/'):
@@ -27,7 +27,7 @@ def get(url):
             )
         else:
             return dict(
-                status = status_code,
+                status = response.status_code,
                 body = None,
                 headers = headers,
             )
