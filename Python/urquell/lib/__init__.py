@@ -98,3 +98,12 @@ def call(f, *path):
     return (call_trace(f, *path) or {}).get('value', None)
 Function(lib, call, [
 ])
+
+def map(f, *path):
+    """
+        <p>Execute the same function across all of the remaining inputs.</p>
+    """
+    from urquell.invocation import execute
+    return [execute('%s/%s' % (f, p))['value'] for p in path]
+Function(lib, map, [
+])
