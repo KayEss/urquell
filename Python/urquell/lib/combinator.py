@@ -13,7 +13,7 @@ def I(v, *p, **k):
         <p>This version of the identity combinator cannot work with both path arguments and query string arguments. If there is any path element at all then the query string is discarded. If the path is empty then the query string is returned as a JSON object.</p>
     """
     if not v and not len(p):
-        return k
+        return k or None
     elif len(p):
         return [v] + list(p)
     else:
