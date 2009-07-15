@@ -13,8 +13,9 @@ def object(*keys, **values):
         <p>Constructs a JSON object from the specified keys. Values can be passed as the query string.</p>
     """
     o = {}
-    for k in keys:
-        o[k] = None
+    if len(keys) > 1 and keys[0]:
+        for k in keys:
+            o[k] = None
     for k, v in values.items():
         o[k] = v
     return o
@@ -30,7 +31,7 @@ def array(*path):
     """
         <p>Constructs a JSON array from the path elements.</p>
     """
-    if not path[0]:
+    if len(path) == 1 and not path[0]:
         return []
     return path
 Function(json, array, [
