@@ -15,21 +15,46 @@ def get(url):
     """
     if url:
         response = fetch(url, deadline=10)
-        headers = dict([(k, v) for k, v in response.headers.items()]);
-        mime, encoding = headers.get('content-type', '').split(';')
+        headers = dict([(k, v) for k, v in response.headers.items()])
+        mime, encoding = headers.get('content-type', ';').split(';')[:2]
         if len(encoding):
             charset = encoding.split('=')[1]
         if mime.startswith('text/'):
             return dict(
+                status = response.status_code,
                 body = response.content.decode(charset),
                 headers = headers,
             )
         else:
             return dict(
+                status = status_code,
                 body = None,
                 headers = headers,
             )
     else:
         return None
 http.pure(get, [
+    '*zmHOYaYg'
+])
+
+def headers(url):
+    """
+        <p>Returns only the HTTP headers for a request performed through HEAD request.</p>
+    """
+    if url:
+        response = fetch(url, method="HEAD", deadline=10)
+        return dict([(k, v) for k, v in response.headers.items()])
+http.pure(headers, [
+    '*zmHOYaYg'
+])
+
+def status(url):
+    """
+        <p>Returns only the status code for a request performed through HEAD request.</p>
+    """
+    if url:
+        response = fetch(url, method="HEAD", deadline=10)
+        return response.status_code
+http.pure(status, [
+    '*zmHOYaYg'
 ])
