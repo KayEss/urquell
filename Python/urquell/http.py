@@ -15,46 +15,58 @@ class Module(object):
         self.name = name
         self.submodules = []
         self.functions = []
+        self.description = description
         if smodule:
             smodule.submodules.append(self)
-        Responder.modules[self.path()] = self
-        class Describe(webapp.RequestHandler):
-            def get(describer):
-                describer.response.out.write(template.render('urquell/templates/module.html', dict(
-                    module = self,
-                    description = description
-                )))
-        Responder.urls.append(('%s/$' % self.path(), Describe))
+        else:
+            Responder.modules.append(self)
+
     def path(self):
         if self.supermodule:
             return "%s/%s" % (self.supermodule.path(), self.name)
         else:
             return "/%s" % self.name
 
-    def pure(self, fn, examples = [], func_name=None):
+    def resolve(self, path):
+        if not path:
+            return self
+        else:
+            for m in self.submodules + self.functions:
+                if path.startswith('%s/' % m.name):
+                    return m.resolve(path[len(m.name)+1:])
+
+    def get(self, request):
+        return template.render('urquell/templates/module.html', dict(
+            module = self,
+            description = self.description
+        )), None
+
+class Function(object):
+    def __init__(self, module, fn, examples = [], func_name=None):
         if func_name:
             fn.func_name = func_name
-        self.functions.append(fn)
-        module = self
-        name = "%s/%s/.*" % (module.path(), fn.func_name)
-        class Process(webapp.RequestHandler):
-            def examples(self, exes):
-                return template.render('urquell/templates/examples.html', dict(
-                    module = module,
-                    function = fn,
-                    examples = exes
-                ))
-            def get(self):
-                json, obj = invoke(self.request.path, self.request, module, fn)
-                if self.request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
-                    self.response.headers['Content-Type'] = 'text/plain'
-                    self.response.out.write(json)
-                else:
-                    self.response.out.write(template.render('urquell/templates/describe.html', dict(
-                        result = obj,
-                        value = dumps(obj.get('value', None)),
-                        module = module,
-                        function = fn,
-                        examples = self.examples(examples)
-                    )))
-        Responder.urls.append((name, Process))
+        self.module = module
+        self.fn = fn
+        self.name = func_name or fn.func_name
+        self.examples = examples
+        self.module.functions.append(self)
+
+    def resolve(self, path):
+        return self
+
+    def get(self, request):
+        json, obj = invoke(request.path, request, self.module, self.fn)
+        if request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
+            return json, 'text/plain'
+        else:
+            return template.render('urquell/templates/describe.html', dict(
+                result = obj,
+                value = dumps(obj.get('value', None)),
+                module = self.module,
+                function = self.fn,
+                examples = template.render('urquell/templates/examples.html', dict(
+                    module = self.module,
+                    function = self.fn,
+                    examples = self.examples
+                )),
+            )), None

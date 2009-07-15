@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from urquell.http import Module
+from urquell.http import Module, Function
 from urquell.lib import lib, call
 from urquell.invocation import path_args
 
@@ -18,7 +18,7 @@ def I(v, *p, **k):
         return [v] + list(p)
     else:
         return v
-combinator.pure(I, [
+Function(combinator, I, [
     '123',
     'hello%20world',
     'hello/world',
@@ -33,7 +33,7 @@ def K(f, *z, **kw):
     """
     call(f, *z, **kw)
     return f
-combinator.pure(K, [
+Function(combinator, K, [
 ])
 
 def S(*v):

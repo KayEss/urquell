@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from urquell.http import Module
+from urquell.http import Module, Function
 from urquell.lib import lib
 from urquell.invocation import path_args
 from google.appengine.api.urlfetch import fetch
@@ -33,7 +33,7 @@ def get(url):
             )
     else:
         return None
-http.pure(get, [
+Function(http, get, [
     '*zmHOYaYg'
 ])
 
@@ -44,7 +44,7 @@ def headers(url):
     if url:
         response = fetch(url, method="HEAD", deadline=10)
         return dict([(k, v) for k, v in response.headers.items()])
-http.pure(headers, [
+Function(http, headers, [
     '*zmHOYaYg'
 ])
 
@@ -55,6 +55,6 @@ def status(url):
     if url:
         response = fetch(url, method="HEAD", deadline=10)
         return response.status_code
-http.pure(status, [
+Function(http, status, [
     '*zmHOYaYg'
 ])
