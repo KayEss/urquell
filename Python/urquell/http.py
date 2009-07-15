@@ -45,19 +45,16 @@ class Module(object):
                     examples = exes
                 ))
             def get(self):
-                if self.request.path.endswith(".json"): # deprecated
-                    invoke(self.request.path[:-5], self.request, module, fn)
+                json, obj = invoke(self.request.path, self.request, module, fn)
+                if self.request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
+                    self.response.headers['Content-Type'] = 'text/plain'
+                    self.response.out.write(json)
                 else:
-                    json, obj = invoke(self.request.path, self.request, module, fn)
-                    if self.request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
-                        self.response.headers['Content-Type'] = 'text/plain'
-                        self.response.out.write(json)
-                    else:
-                        self.response.out.write(template.render('urquell/templates/describe.html', dict(
-                            result = obj,
-                            value = dumps(obj.get('value', None)),
-                            module = module,
-                            function = fn,
-                            examples = self.examples(examples)
-                        )))
+                    self.response.out.write(template.render('urquell/templates/describe.html', dict(
+                        result = obj,
+                        value = dumps(obj.get('value', None)),
+                        module = module,
+                        function = fn,
+                        examples = self.examples(examples)
+                    )))
         Responder.urls.append((name, Process))
