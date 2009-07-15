@@ -28,7 +28,7 @@ def invoke(path, request, module, fn):
         [(str(k), resolver_query(request.GET[k])) for k in request.GET]
     )
     object = {
-        'hash': u'=%s' % unicode(ihash),
+        'hash': u'*%s' % unicode(ihash),
         'name': '%s/%s' % (module.path(), fn.func_name),
         'args': [u for u, x in call_trace],
         'path': path,
@@ -48,14 +48,14 @@ def execute(url):
         return None
 
 def store_invocation(a_url):
-    def gen_ihash():
-        ihash = os.urandom(16).encode("base64")[:6]
-        invocation = Invocation.gql("WHERE ihash = '%s'" % ihash).fetch(1)
-        if len(invocation):
-            return gen_ihash()
-        return ihash
-    invocation = Invocation.gql("WHERE url = '%s'" % a_url).fetch(1)
+    invocation = Invocation.gql("WHERE url = :1", a_url).fetch(1)
     if not len(invocation):
+        def gen_ihash():
+            ihash = os.urandom(6).encode("base64")[:8].replace('+', '-').replace('/', '_')
+            invocation = Invocation.gql("WHERE ihash = :1", ihash).fetch(1)
+            if len(invocation):
+                return gen_ihash()
+            return ihash
         ihash = gen_ihash()
         invocation = Invocation(ihash=ihash,url=a_url)
         db.put(invocation)
@@ -69,10 +69,10 @@ REAL = re.compile('^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$')
 FUNCTION = re.compile('^=')
 def resolver_path(value):
     value = urllib.unquote(value)
-    if FUNCTION.match(value):
-        return resolve_function(value)
-    elif value.startswith('=='):
+    if value.startswith('**'):
         value = value[1:]
+    elif value.startswith('*'):
+        return resolve_function(value[1:])
 
     if value.isdigit():
         return (value, int(value))
@@ -84,8 +84,7 @@ def resolver_query(value):
     return value
 
 def resolve_function(value):
-    value = value[1:]
-    dest = Invocation.gql("WHERE ihash = '%s'" % value).fetch(1)
+    dest = Invocation.gql("WHERE ihash = :1", value).fetch(1)
     if not len(dest):
         raise Exception("Unable to resolve function invocation. Invocation hash: %s" % value)
     url = dest[0].url
