@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from urquell.http import Module, Function
 from urquell.invocation import path_args
-import test
+import urllib
 
 lib = Module(None, 'lib', """A general purpose library providing a number of useful functions.""")
 
@@ -74,10 +74,18 @@ Function(lib, fn, [
     'urquell-fn.appspot.com/lib/echo/hello/%20/world',
     'urquell-fn.appspot.com/lib/add/1',
 ])
-def bind(f, *path):
-    """Binds arguments to a function."""
+def bind(f, *path, **kwargs):
+    """
+        <p>Binds arguments to a function. The arguments come from the query string and the named query string keys are placed at the locations specified.</p>
+    """
     if f and len(path):
-        return "%s/%s" % (f, path_args(path))
+        for p in path:
+            v = urllib.quote(kwargs.get(p, ''))
+            if f[-1] == '/':
+                f = '%s%s' % (f, v)
+            else:
+                f = '%s/%s' % (f, v)
+        return f
     elif f:
         return f
     else:
