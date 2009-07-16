@@ -36,7 +36,12 @@ def K(f, *z, **kw):
 Function(combinator, K, [
 ])
 
-def S(*v):
+def S(z, y, *xs, **kw):
     """
         <p>The S combinator.</p>
     """
+    v = call(y, *xs, **kw)
+    f = call(z, *xs, **kw)
+    return call(f, *v, **kw)
+Function(combinator, S, [
+])
