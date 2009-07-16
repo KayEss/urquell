@@ -8,7 +8,7 @@ from google.appengine.api.urlfetch import fetch
 http = Module(lib, 'http', """HTTP functions.""")
 
 
-def get(url):
+def get(url, **kwargs):
     """
         <p>Does a HTTP get on the specified URL and returns the response. This will only return the body text if the resource is text.</p>
         <p>If the encoding isn't properly specified in the target page's Content-Type then it's quite likely to error.</p>
@@ -37,7 +37,7 @@ Function(http, get, [
     '*zmHOYaYg'
 ])
 
-def headers(url):
+def headers(url, **kwargs):
     """
         <p>Returns only the HTTP headers for a request performed through HEAD request.</p>
     """
@@ -48,7 +48,7 @@ Function(http, headers, [
     '*zmHOYaYg'
 ])
 
-def status(url):
+def status(url, **kwargs):
     """
         <p>Returns only the status code for a request performed through HEAD request.</p>
     """

@@ -41,9 +41,13 @@ def invoke(path, request, module, fn):
 
 def execute(url):
     if url:
-        return loads(fetch(url, headers={
+        json = fetch(url, headers={
             'X-Requested-With': 'XMLHttpRequest',
-        }).content)
+        }).content
+        try:
+            return loads(json)
+        except Exception, e:
+            raise Exception(json)
     else:
         return None
 
@@ -90,8 +94,9 @@ def resolve_function(value):
     url = dest[0].url
     json = memcache.get(value)
     if not json:
-        json = fetch(url).content
-    return (url, loads(json)['value'])
+        return (url, execute(url)['value'])
+    else:
+        return (url, loads(json)['value'])
 
 def path_args(path):
-    return '/'.join([urllib.quote(unicode(p)) for p in path])
+    return '/'.join([urllib.quote(unicode(p), '') for p in path])

@@ -27,7 +27,7 @@ Function(json, object, [
     '?key1=45&key2=Hello+world'
 ])
 
-def array(*path):
+def array(*path, **kwargs):
     """
         <p>Constructs a JSON array from the path elements.</p>
     """

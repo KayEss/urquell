@@ -19,7 +19,7 @@ Function(lib, echo, [
     'hello%20country,%20goodbye%20nightclub',
 ])
 
-def add(a, *b):
+def add(a, *b, **kw):
     """Add numbers"""
     for v in b:
         a = a + v
@@ -28,7 +28,7 @@ Function(lib, add, [
     '1/2',
     '1/2/3/4',
 ])
-def sub(a, *b):
+def sub(a, *b, **kw):
     """Subtract one number from another"""
     for v in b:
         a = a - v
@@ -38,7 +38,7 @@ Function(lib, sub, [
     '2/1',
     '2/1/-1',
 ])
-def mul(a, *b):
+def mul(a, *b, **kw):
     """Multiply a set of numbers together"""
     for v in b:
         a = a * v
@@ -46,7 +46,7 @@ def mul(a, *b):
 Function(lib, mul, [
     '2/1',
 ])
-def div(a, *b):
+def div(a, *b, **kw):
     """Divide a set of numbers"""
     for v in b:
         a = a / v
@@ -56,7 +56,7 @@ Function(lib, div, [
     '2/3.0/6',
 ])
 
-def ift(c, t = None, *f):
+def ift(c, t = None, *f, **kw):
     """A conditional which returns its first argument if the condition is met, otherwise it returns all the other arguments."""
     if bool(c):
         return t
@@ -66,7 +66,7 @@ Function(lib, ift, [
 ], func_name = "if")
 
 
-def fn(server, *path):
+def fn(server, *path, **kw):
     """Constructs a function from a server name and a path."""
     return "http://%s/%s" % (server, path_args(path))
 Function(lib, fn, [
@@ -80,7 +80,7 @@ def bind(f, *path, **kwargs):
     """
     if f and len(path):
         for p in path:
-            v = urllib.quote(kwargs.get(p, ''))
+            v = urllib.quote(kwargs.get(p, ''), '')
             if f[-1] == '/':
                 f = '%s%s' % (f, v)
             else:
@@ -92,22 +92,32 @@ def bind(f, *path, **kwargs):
         return None
 Function(lib, bind, [
 ])
-def call_trace(f, *path):
-    """Execute a function and return all of the debugging information."""
+def call_trace(f, *path, **kwargs):
+    """
+        <p>Execute a function and return all of the debugging information.</p>
+    """
     from urquell.invocation import execute
+    query_string = '&'.join(['%s=%s' % (urllib.quote(k), urllib.quote(v)) for k, v in kwargs.items()])
     if len(path):
-        return execute('%s/%s' % (f, path_args(path)))
+        if f[-1] == '/':
+            f = '%s%s' % (f, path_args(path))
+        else:
+            f = '%s/%s' % (f, path_args(path))
+    if query_string:
+        return execute('%s?%s' % (f, query_string))
     else:
         return execute(f)
 Function(lib, call_trace, [
 ])
-def call(f, *path):
-    """Execute a function returning just the function's return value."""
-    return (call_trace(f, *path) or {}).get('value', None)
+def call(f, *path, **kwargs):
+    """
+        <p>Execute a function returning just the function's return value.</p>
+    """
+    return (call_trace(f, *path, **kwargs) or {}).get('value', None)
 Function(lib, call, [
 ])
 
-def map(f, *path):
+def map(f, *path, **kw):
     """
         <p>Execute the same function across all of the remaining inputs.</p>
     """
