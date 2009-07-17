@@ -25,25 +25,30 @@ def on_document_changed(properties, context):
   content = blip.GetDocument().GetText()
 
   exec_pos = content.rfind('!x')
-  desc_pos = content.rfind('!d')  	
+  desc_pos = content.rfind('!d')
 
   if exec_pos > -1:
-    handle_exec(blip,content,exec_pos)	
+    handle_exec(blip,content,exec_pos)
   elif desc_pos > -1:
     handle_desc(blip,content,desc_pos)
-	 
+
 def handle_exec(blip, content, exec_pos):
   url_pos = content.rfind('http://')
   doc = blip.GetDocument()
   stack_frame = u''
   formatted_args = u''
 
-  result = execute(content[url_pos:exec_pos])
-  format = u'Hash: %s     Name: %s     Result: %s\nArgs: %s'
-  data = (result['hash'], result['name'], result['value'], ', '.join(result['args']))
-  stack_frame =  format % data 
+  try:
+    result = execute(content[url_pos:exec_pos])
+    if result:
+        format = u'Hash: %s     Name: %s     Result: %s\nArgs: %s'
+        data = (result['hash'], result['name'], result['value'], ', '.join(result['args']))
+        stack_frame =  format % data
 
-  doc.SetTextInRange(document.Range(url_pos,exec_pos + 2), ('%s\n\n%s' % (stack_frame,result['hash'])))
+        doc.SetTextInRange(document.Range(url_pos,exec_pos + 2), ('%s\n\n%s' % (stack_frame,result['hash'])))
+  except Exception, e:
+    description = unicode(e)
+    # Put in blip somewhere?
 
 def handle_desc(blip, content, desc_pos):
   pass
