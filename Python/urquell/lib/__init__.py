@@ -76,7 +76,10 @@ Function(lib, fn, [
 ])
 def bind(f, *path, **kwargs):
     """
-        <p>Binds arguments to a function. The arguments come from the query string and the named query string keys are placed at the locations specified.</p>
+        <p>Binds an argument list to a function. Optionally, values can also be 
+        bound to those arguments using the query string. When the argument list 
+        is left unbound, values can later be applied using functions such as 
+        lib/call and lib/combinator/K.</p>
     """
     if f and len(path):
         for p in path:
@@ -91,6 +94,8 @@ def bind(f, *path, **kwargs):
     else:
         return None
 Function(lib, bind, [
+	'*2wuQZl_G/a/b/c',
+	'*-UvxBuFm/a/b/c?a=1&b=2&c=3'
 ])
 def call_trace(f, *path, **kwargs):
     """
