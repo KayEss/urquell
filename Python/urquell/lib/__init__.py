@@ -33,7 +33,6 @@ def sub(a, *b, **kw):
     for v in b:
         a = a - v
     return a
-    return a - b
 Function(lib, sub, [
     '2/1',
     '2/1/-1',
@@ -76,9 +75,9 @@ Function(lib, fn, [
 ])
 def bind(f, *path, **kwargs):
     """
-        <p>Binds an argument list to a function. Optionally, values can also be 
-        bound to those arguments using the query string. When the argument list 
-        is left unbound, values can later be applied using functions such as 
+        <p>Binds an argument list to a function. Optionally, values can also be
+        bound to those arguments using the query string. When the argument list
+        is left unbound, values can later be applied using functions such as
         lib/call and lib/combinator/K.</p>
     """
     if f and len(path):
