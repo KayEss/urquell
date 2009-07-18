@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from urquell.http import Module, Function
 from urquell.invocation import path_args
+from jsonrpc.json import dumps
 import urllib
 
 lib = Module(None, 'lib', """A general purpose library providing a number of useful functions.""")
@@ -64,6 +65,18 @@ def ift(c, t = None, *f, **kw):
 Function(lib, ift, [
 ], func_name = "if")
 
+
+def throw(message, *args, **kwargs):
+    """
+        <p>Raises an exception with the first argument as the main exception text also giving it a JSON representation of the arguments and kwargs</p>
+    """
+    try:
+        json = dumps({'args':args, 'kwargs':kwargs})
+    except Exception, e:
+        raise Exception('%s\nError generating JSON: %s' % (message, e))
+    raise Exception('%s\n%s' % (message, json))
+Function(lib, throw, [
+])
 
 def fn(server, *path, **kw):
     """Constructs a function from a server name and a path."""
