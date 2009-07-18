@@ -6,14 +6,11 @@ from google.appengine.api.urlfetch import fetch
 
 from jsonrpc.json import dumps, loads
 
-"""
-Example record
+class ErrorTrace(Exception):
+    def __init__(self, message, trace = {}):
+        self.message = message
+        self.trace = trace
 
-{
-ihash: '3jdHes',
-url: 'http://urquell-fn.appspot.com/lib/sub/3/4.json
-}
-"""
 
 class Invocation(db.Model):
   ihash = db.StringProperty(required=True)
@@ -21,25 +18,28 @@ class Invocation(db.Model):
 
 def invoke(path, request, module, fn):
     ihash = store_invocation(request.url)
-    parts = path[len(module.path()) + len(fn.func_name) + 2:].split('/')
-    call_trace = [resolver_path(str(i)) for i in parts]
-    args = [x for u, x in call_trace]
-    kwargs = dict(
-        [(str(k), resolver_query(request.GET[k])) for k in request.GET]
-    )
     object = {
         'hash': u'*%s' % unicode(ihash),
         'name': '%s/%s' % (module.path(), fn.func_name),
-        'args': [u for u, x in call_trace],
         'path': path,
         'headers': dict([(k, unicode(v)) for k, v in request.headers.items()]),
     }
+    parts = path[len(module.path()) + len(fn.func_name) + 2:].split('/')
     try:
+        call_trace = [resolver_path(str(i)) for i in parts]
+        kwargs = dict(
+            [(str(k), resolver_query(request.GET[k])) for k in request.GET]
+        )
+        args = [x for u, x in call_trace]
+        object['args'] = [u for u, x in call_trace]
         object['value'] = fn(*args, **kwargs)
+    except ErrorTrace, e:
+        object['error'] = {'message': e.message, 'trace': e.trace}
     except Exception, e:
         object['error'] = {'message': unicode(e)}
     json = dumps(object)
-    memcache.add(ihash, json, 300)
+    if object.has_key('value'):
+        memcache.add(ihash, json, 300)
     return json, object
 
 def execute(url):
@@ -93,13 +93,17 @@ def resolver_query(value):
 def resolve_function(value):
     dest = Invocation.gql("WHERE ihash = :1", value).fetch(1)
     if not len(dest):
-        raise Exception("Unable to resolve function invocation. Invocation hash: %s" % value)
+        raise ErrorTrace("Unable to resolve function invocation. Invocation hash: %s" % value)
     url = dest[0].url
     json = memcache.get(value)
     if not json:
-        return (url, execute(url)['value'])
+        rvalue = execute(url)
     else:
-        return (url, loads(json)['value'])
+        rvalue = loads(json)
+    if rvalue.has_key('value'):
+        return url, rvalue['value']
+    else:
+        raise ErrorTrace("Whilst resolving binding value %s" % value, rvalue)
 
 def path_args(path):
     return '/'.join([urllib.quote(unicode(p), '') for p in path])

@@ -24,7 +24,8 @@ class Responder(webapp.RequestHandler):
     def get(self):
         hit = self.hit(self.request.path)
         if hit:
-            response, mime = hit.get(self.request)
+            response, mime, status = hit.get(self.request)
+            self.response.set_status(status)
             if mime:
                 self.response.headers['Content-Type'] = mime
             self.response.out.write(response)

@@ -39,7 +39,7 @@ class Module(object):
         return template.render('urquell/templates/module.html', dict(
             module = self,
             description = self.description
-        )), None
+        )), None, 200
 
 class Function(object):
     def __init__(self, module, fn, examples = [], func_name=None):
@@ -56,8 +56,12 @@ class Function(object):
 
     def get(self, request):
         json, obj = invoke(request.path, request, self.module, self.fn)
+        if obj.has_key('error'):
+            status = 500
+        else:
+            status = 200
         if request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
-            return json, 'text/plain'
+            return json, 'text/plain', status
         else:
             return template.render('urquell/templates/describe.html', dict(
                 result = obj,
@@ -70,4 +74,4 @@ class Function(object):
                     function = self.fn,
                     examples = self.examples
                 )),
-            )), None
+            )), None, status
