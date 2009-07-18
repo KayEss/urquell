@@ -85,6 +85,20 @@ class Function(Contained):
     def path(self):
         return "%s/%s" % (self.container.path(), self.name)
 
+    def describe(self, json, obj, status):
+        return template.render('urquell/templates/describe.html', dict(
+            result = obj,
+            value = dumps(obj.get('value', None)),
+            error = obj.get('error', None),
+            module = self.container,
+            function = self,
+            examples = template.render('urquell/templates/examples.html', dict(
+                module = self.container,
+                function = self.fn,
+                examples = self.examples
+            )),
+        )), None, status
+
     def get(self, responder, *path, **kwargs):
         json, obj = invoke(responder.request.path, responder.request, self.container, self.fn)
         if obj.has_key('error'):
@@ -94,15 +108,4 @@ class Function(Contained):
         if responder.request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
             return json, 'text/plain', status
         else:
-            return template.render('urquell/templates/describe.html', dict(
-                result = obj,
-                value = dumps(obj.get('value', None)),
-                error = obj.get('error', None),
-                module = self.container,
-                function = self,
-                examples = template.render('urquell/templates/examples.html', dict(
-                    module = self.container,
-                    function = self.fn,
-                    examples = self.examples
-                )),
-            )), None, status
+            return self.describe(json, obj, status)
