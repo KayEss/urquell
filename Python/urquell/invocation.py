@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import urllib
+import os, urllib
 from google.appengine.ext import db
 from google.appengine.api import memcache
 from google.appengine.api.urlfetch import fetch
 
 from jsonrpc.json import dumps, loads
+
 
 class ErrorTrace(Exception):
     def __init__(self, message, trace = {}):
@@ -17,6 +18,7 @@ class Invocation(db.Model):
   url = db.StringProperty(required=True)
 
 def invoke(path, request, module, fn):
+    from urquell.value import resolve_part
     ihash = store_invocation(request.url)
     object = {
         'hash': u'*%s' % unicode(ihash),
@@ -26,9 +28,9 @@ def invoke(path, request, module, fn):
     }
     parts = path[len(module.path()) + len(fn.func_name) + 2:].split('/')
     try:
-        call_trace = [resolver_path(str(i)) for i in parts]
+        call_trace = [resolve_part(str(i)) for i in parts]
         kwargs = dict(
-            [(str(k), resolver_query(request.GET[k])) for k in request.GET]
+            [(str(k), resolve_part(request.GET[k])) for k in request.GET]
         )
         args = [x for u, x in call_trace]
         object['args'] = [u for u, x in call_trace]
@@ -69,41 +71,3 @@ def store_invocation(a_url):
         return ihash
     else:
         return invocation[0].ihash
-
-import re, urllib, os
-
-REAL = re.compile('^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$')
-FUNCTION = re.compile('^=')
-def resolver_path(value):
-    value = urllib.unquote(value)
-    if value.startswith('**'):
-        value = value[1:]
-    elif value.startswith('*'):
-        return resolve_function(value[1:])
-
-    if value.isdigit():
-        return (value, int(value))
-    elif REAL.match(value):
-        return (value, float(value))
-    return (value, value)
-
-def resolver_query(value):
-    return value
-
-def resolve_function(value):
-    dest = Invocation.gql("WHERE ihash = :1", value).fetch(1)
-    if not len(dest):
-        raise ErrorTrace("Unable to resolve function invocation. Invocation hash: %s" % value)
-    url = dest[0].url
-    json = memcache.get(value)
-    if not json:
-        rvalue = execute(url)
-    else:
-        rvalue = loads(json)
-    if rvalue.has_key('value'):
-        return url, rvalue['value']
-    else:
-        raise ErrorTrace("Whilst resolving binding value %s" % value, rvalue)
-
-def path_args(path):
-    return '/'.join([urllib.quote(unicode(p), '') for p in path])

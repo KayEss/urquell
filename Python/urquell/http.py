@@ -5,7 +5,7 @@ from google.appengine.api import memcache
 
 from jsonrpc.json import dumps, loads
 
-from urquell.invocation import invoke, store_invocation, resolver_path, resolver_query
+from urquell.invocation import invoke, store_invocation
 
 
 class Responder(webapp.RequestHandler):

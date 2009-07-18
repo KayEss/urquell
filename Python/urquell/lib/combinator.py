@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from urquell.http import Module, Function
 from urquell.lib import lib, call
-from urquell.invocation import path_args
+from urquell.value import path_args
 
 
 combinator = Module(lib, 'combinator', """Various combinators. All of the combinators throw away key word arguments.""")

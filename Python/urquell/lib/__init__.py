@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from urquell.http import Module, Function, root
-from urquell.invocation import path_args
+from urquell.value import path_args
 from jsonrpc.json import dumps
 import urllib
 

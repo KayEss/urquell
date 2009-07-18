@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from urquell.http import Module, Function
 from urquell.lib import lib
-from urquell.invocation import path_args
 from google.appengine.api.urlfetch import fetch
 
 
