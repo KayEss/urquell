@@ -62,6 +62,7 @@ class Function(object):
             return template.render('urquell/templates/describe.html', dict(
                 result = obj,
                 value = dumps(obj.get('value', None)),
+                error = obj.get('error', None),
                 module = self.module,
                 function = self.fn,
                 examples = template.render('urquell/templates/examples.html', dict(

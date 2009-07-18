@@ -32,9 +32,12 @@ def invoke(path, request, module, fn):
         'name': '%s/%s' % (module.path(), fn.func_name),
         'args': [u for u, x in call_trace],
         'path': path,
-        'value': fn(*args, **kwargs),
         'headers': dict([(k, unicode(v)) for k, v in request.headers.items()]),
     }
+    try:
+        object['value'] = fn(*args, **kwargs)
+    except Exception, e:
+        object['error'] = {'message': unicode(e)}
     json = dumps(object)
     memcache.add(ihash, json, 300)
     return json, object

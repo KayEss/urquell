@@ -7,8 +7,13 @@
 
     <h2>Result</h2>
     <dl>
-        <dt>Return value</dt>
-            <dd>{{ value|escape }}</dd>
+        {% if error %}
+            <dt>Error</dt>
+                <dd class="Error">{{ error.message|escape }}</dd>
+        {% else %}
+            <dt>Return value</dt>
+                <dd>{{ value|escape }}</dd>
+        {% endif %}
         <dt>Binding code</dt>
             <dd>{{ result.hash }}</dd>
     </dl>
