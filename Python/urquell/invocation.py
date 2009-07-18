@@ -17,7 +17,7 @@ class Invocation(db.Model):
   ihash = db.StringProperty(required=True)
   url = db.StringProperty(required=True)
 
-def invoke(path, request, module, fn):
+def invoke(request, module, fn, *path, **kwargs):
     from urquell.value import resolve_part
     ihash = store_invocation(request.url)
     object = {
@@ -26,9 +26,8 @@ def invoke(path, request, module, fn):
         'path': path,
         'headers': dict([(k, unicode(v)) for k, v in request.headers.items()]),
     }
-    parts = path[len(module.path()) + len(fn.func_name) + 2:].split('/')
     try:
-        call_trace = [resolve_part(str(i)) for i in parts]
+        call_trace = [resolve_part(str(i)) for i in path]
         kwargs = dict(
             [(str(k), resolve_part(request.GET[k])) for k in request.GET]
         )

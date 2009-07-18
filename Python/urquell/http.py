@@ -6,12 +6,13 @@ from google.appengine.api import memcache
 from jsonrpc.json import dumps, loads
 
 from urquell.invocation import invoke, store_invocation
+from urquell.value import resolve_part
 
 
 class Responder(webapp.RequestHandler):
     def get(self):
-        path = self.request.path.split('/')
-        response, mime, status = root.get(self, *path)
+        #path = [resolve_part(str(i))[1] for i in self.request.path[1:].split('/')]
+        response, mime, status = root.get(self, *self.request.path[1:].split('/'))
         self.response.set_status(status)
         if mime:
             self.response.headers['Content-Type'] = mime
@@ -100,7 +101,7 @@ class Function(Contained):
         )), None, status
 
     def get(self, responder, *path, **kwargs):
-        json, obj = invoke(responder.request.path, responder.request, self.container, self.fn)
+        json, obj = invoke(responder.request, self.container, self.fn, *path, **kwargs)
         if obj.has_key('error'):
             status = 500
         else:
