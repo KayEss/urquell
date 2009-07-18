@@ -3,6 +3,8 @@ from waveapi import model
 from waveapi import document
 from urquell.invocation import execute
 from wave.session import SessionWrapper
+from wave.display import FrameDisplay
+import sys
 
 class WaveHandler(object):
   content = None
@@ -40,15 +42,11 @@ class WaveHandler(object):
       expr = self.content[expr_pos:exec_pos]
       result = execute(expr)
       if result:
-        format = u'%s\nHash: %s     Name: %s     Result: %s\nArgs: %s'
-        data = (expr,result['hash'], result['name'], result['value'], ', '.join(result['args']))
-        stack_frame =  format % data
-
+        result['url'] = expr
         sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
         sess.frames[result['hash']] = result
         sess.save()
-		
-        doc.SetTextInRange(document.Range(expr_pos,exec_pos + 2), ('%s\n\n%s' % (stack_frame,result['hash'])))
+        FrameDisplay(doc,sess).display()
     except Exception, e:
       doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
       self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % unicode(e))
