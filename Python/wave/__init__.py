@@ -3,67 +3,74 @@ from waveapi import events
 from waveapi import model
 from waveapi import robot
 from waveapi import document
-
-import re
-from uri_validate import absolute_URI
-URIregex = re.compile(absolute_URI, re.VERBOSE)
-
-import urllib
-from jsonrpc.json import dumps, loads
 from google.appengine.api.urlfetch import fetch
-
 from urquell.invocation import execute
+from wave import session
 
-def on_robot_added(properties, context):
-  """Invoked when the robot has been added."""
-  root_wavelet = context.GetRootWavelet()
-  root_wavelet.CreateBlip().GetDocument().SetText("Urquell calling - !x to execute, !d to describe")
+# import re
+# from uri_validate import absolute_URI
+# URIregex = re.compile(absolute_URI, re.VERBOSE)
+# 
+# import urllib
+# from jsonrpc.json import dumps, loads
 
-def on_document_changed(properties, context):
-  blipid = properties['blipId']
-  blip = context.GetBlipById(blipid)
-  content = blip.GetDocument().GetText()
+class WaveHandler(object):
+  content = None
+  blip = None
+  wavelet = None
+  wave = None
 
-  exec_pos = content.rfind('!x')
-  desc_pos = content.rfind('!d')
+  def on_robot_added(self,properties, context):
+    """Invoked when the robot has been added."""
+    root_wavelet = context.GetRootWavelet()
+    root_wavelet.CreateBlip().GetDocument().SetText("Urquell calling - !x to execute, !d to describe")
 
-  if exec_pos > -1:
-    wavelet = context.GetWaveletById(blip.GetWaveletId())
-    handle_exec(blip,content,exec_pos,wavelet)
-  elif desc_pos > -1:
-    handle_desc(blip,content,desc_pos)
+  def on_document_changed(self,properties, context):
+    blipid = properties['blipId']
+    self.blip = context.GetBlipById(blipid)
+    self.content = self.blip.GetDocument().GetText()
+    self.wavelet = context.GetWaveletById(self.blip.GetWaveletId())
+    self.wave = context.GetWaveById(self.blip.GetWaveId())
+	
+    exec_pos = self.content.rfind('!x')
+    desc_pos = self.content.rfind('!d')
 
-def handle_exec(blip, content, exec_pos, wavelet):
-  expr_pos = content.find('http',content.rpartition('!x')[0].rfind('\n'))
-  doc = blip.GetDocument()
-  stack_frame = u''
-  formatted_args = u''
+    if exec_pos > -1:
+      self.handle_exec(exec_pos)
+    elif desc_pos > -1:
+      self.handle_desc(desc_pos)
 
-  try:
-    expr = content[expr_pos:exec_pos]
-    result = execute(expr)
-    if result:
+  def handle_exec(self,exec_pos):
+    doc = self.blip.GetDocument()
+    expr_pos = self.content.find('http',self.content.rpartition('!x')[0].rfind('\n'))
+    stack_frame = u''
+    formatted_args = u''
+
+    try:
+      expr = self.content[expr_pos:exec_pos]
+      result = execute(expr)
+      if result:
         format = u'%s\nHash: %s     Name: %s     Result: %s\nArgs: %s'
         data = (expr,result['hash'], result['name'], result['value'], ', '.join(result['args']))
         stack_frame =  format % data
-  
         doc.SetTextInRange(document.Range(expr_pos,exec_pos + 2), ('%s\n\n%s' % (stack_frame,result['hash'])))
-  except Exception, e:
-    doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
-    wavelet.CreateBlip().GetDocument().SetText('Exception thrown:\n%s' % unicode(e))
+    except Exception, e:
+      doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
+      self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % unicode(e))
 
-def handle_desc(blip, content, desc_pos):
-  pass
+  def handle_desc(self,desc_pos):
+    pass
 
 def main():
   myRobot = robot.Robot(
-      'urquell-fn',
+      'lurquell',
       image_url='http://urquell-fn.appspot.com/assets/icon.jpg',
       version='5',
       profile_url='http://urquell-fn.appspot.com/'
   )
-  myRobot.RegisterHandler(events.WAVELET_SELF_ADDED, on_robot_added)
-  myRobot.RegisterHandler(events.DOCUMENT_CHANGED, on_document_changed)
+  handler = WaveHandler()
+  myRobot.RegisterHandler(events.WAVELET_SELF_ADDED, handler.on_robot_added)
+  myRobot.RegisterHandler(events.DOCUMENT_CHANGED, handler.on_document_changed)
   myRobot.Run()
 
 
