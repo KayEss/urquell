@@ -39,16 +39,17 @@ def handle_exec(blip, content, exec_pos):
   formatted_args = u''
 
   try:
-    result = execute(content[url_pos:exec_pos])
+    expr = content[url_pos:exec_pos]
+    result = execute(expr)
     if result:
-        format = u'Hash: %s     Name: %s     Result: %s\nArgs: %s'
-        data = (result['hash'], result['name'], result['value'], ', '.join(result['args']))
+        format = u'%s\nHash: %s     Name: %s     Result: %s\nArgs: %s'
+        data = (expr,result['hash'], result['name'], result['value'], ', '.join(result['args']))
         stack_frame =  format % data
 
         doc.SetTextInRange(document.Range(url_pos,exec_pos + 2), ('%s\n\n%s' % (stack_frame,result['hash'])))
   except Exception, e:
-    description = unicode(e)
-    # Put in blip somewhere?
+    doc.deleteRange(document.Range(exec_pos,exec_pos + 2))
+    blip.CreatChild().blip.GetDocument().setText(unicode(e))
 
 def handle_desc(blip, content, desc_pos):
   pass
