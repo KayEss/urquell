@@ -9,7 +9,7 @@
         <h2>Modules</h2>
         <ul>
             {% for sub in module.submodules %}
-                <li><a href="{{ sub.path|escape }}/">{{ sub.name }}</a></li>
+                <li><a href="{{ sub.path|escape }}">{{ sub.name }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
@@ -18,7 +18,7 @@
         <h2>Functions</h2>
         <ul>
             {% for function in module.functions %}
-                <li><a href="{{ function.name|escape }}/">{{ function.name|escape }}</a></li>
+                <li><a href="{{ function.path|escape }}">{{ function.name|escape }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}

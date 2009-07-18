@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-from urquell.http import Module, Function
+from urquell.http import Module, Function, root
 from urquell.invocation import path_args
 from jsonrpc.json import dumps
 import urllib
 
-lib = Module(None, 'lib', """A general purpose library providing a number of useful functions.""")
+lib = Module(root, 'lib', """
+    <p>A general purpose library providing a number of useful functions.</p>
+""")
 
 def echo(*args, **kwargs):
     """

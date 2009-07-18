@@ -5,72 +5,103 @@ from google.appengine.api import memcache
 
 from jsonrpc.json import dumps, loads
 
-from urquell import Responder
 from urquell.invocation import invoke, store_invocation, resolver_path, resolver_query
 
 
-class Module(object):
-    def __init__(self, smodule, name, description = None):
-        self.supermodule = smodule
+class Responder(webapp.RequestHandler):
+    def get(self):
+        path = self.request.path.split('/')
+        response, mime, status = root.get(self, *path)
+        self.response.set_status(status)
+        if mime:
+            self.response.headers['Content-Type'] = mime
+        self.response.out.write(response)
+
+class EndPoint(object):
+    """
+        This class acts as the root of the Urquell namespace and is placed into the root of the web site. It is responsible for routing the request to the correct function depending on the path contents.
+    """
+    def __init__(self, name, description):
+        super(EndPoint, self).__init__()
         self.name = name
-        self.submodules = []
-        self.functions = []
         self.description = description
-        if smodule:
-            smodule.submodules.append(self)
-        else:
-            Responder.modules.append(self)
+        self.routes = {}
 
     def path(self):
-        if self.supermodule:
-            return "%s/%s" % (self.supermodule.path(), self.name)
-        else:
-            return "/%s" % self.name
-
-    def resolve(self, path):
-        if not path:
-            return self
-        else:
-            for m in self.submodules + self.functions:
-                if path.startswith('%s/' % m.name):
-                    return m.resolve(path[len(m.name)+1:])
-
-    def get(self, request):
-        return template.render('urquell/templates/module.html', dict(
-            module = self,
-            description = self.description
+        return ''
+    def do404(self, responder):
+        return template.render('urquell/templates/404.html', dict(
+            path = responder.request.path
+        )), None, 404
+    def route(self, responder, *path, **kwargs):
+        name, path = path[0], path[1:]
+        function = self.routes.get(name, None)
+        if not function:
+            return self.do404(responder)
+        return function.get(responder, *path, **kwargs)
+    def get(self, responder, *path, **kwargs):
+        if len(path):
+            return self.route(responder, *path, **kwargs)
+        return template.render('urquell/templates/homepage.html', dict(
+            modules = self.routes
         )), None, 200
 
-class Function(object):
-    def __init__(self, module, fn, examples = [], func_name=None):
-        if func_name:
-            fn.func_name = func_name
-        self.module = module
+root = EndPoint(None, None)
+root.routes[''] = root
+
+
+class Contained(EndPoint):
+    def __init__(self, container, name, description):
+        super(Contained, self).__init__(name, description)
+        self.container = container
+        self.container.routes[self.name] = self
+
+    def path(self):
+        return "%s/%s" % (self.container.path(), self.name)
+
+class Module(Contained):
+    def __init__(self, smodule, name, description):
+        super(Module, self).__init__(smodule, name, description)
+        self.submodules = []
+        self.functions = []
+        if hasattr(self.container, 'submodules'):
+            self.container.submodules.append(self)
+
+    def get(self, request, *path, **kwargs):
+        if not len(path):
+            return template.render('urquell/templates/module.html', dict(
+                module = self,
+                description = self.description
+            )), None, 200
+        return self.route(request, *path, **kwargs)
+
+class Function(Contained):
+    def __init__(self, module, fn, examples = [], func_name = None, func_doc = None):
+        super(Function, self).__init__(module, func_name or fn.func_name, func_doc or fn.func_doc)
+        self.container.functions.append(self)
         self.fn = fn
-        self.name = func_name or fn.func_name
         self.examples = examples
-        self.module.functions.append(self)
 
-    def resolve(self, path):
-        return self
+    def path(self):
+        return "%s/%s" % (self.container.path(), self.name)
 
-    def get(self, request):
-        json, obj = invoke(request.path, request, self.module, self.fn)
+    def get(self, responder, *path, **kwargs):
+        json, obj = invoke(responder.request.path, responder.request, self.container, self.fn)
         if obj.has_key('error'):
             status = 500
         else:
             status = 200
-        if request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
+        if responder.request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
             return json, 'text/plain', status
         else:
             return template.render('urquell/templates/describe.html', dict(
                 result = obj,
                 value = dumps(obj.get('value', None)),
                 error = obj.get('error', None),
-                module = self.module,
-                function = self.fn,
+                module = self.container,
+                function = self,
                 examples = template.render('urquell/templates/examples.html', dict(
-                    module = self.module,
+                    module = self.container,
                     function = self.fn,
                     examples = self.examples
                 )),
