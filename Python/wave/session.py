@@ -16,7 +16,7 @@ class Session(db.Model):
 	sid = db.StringProperty(required=True)
 	# a JSON object whose properties are Urquell invocation hash's, and 
 	# values are call frames.
-	frames = db.StringProperty(required=True)
+	frames = db.TextProperty(required=True)
 	# last modified timestamp, so we can cull stale sessions periodically
 	modified = db.DateTimeProperty(auto_now=True)
 
@@ -27,7 +27,8 @@ class SessionWrapper(object):
 	
 	def __init__(self,sid):	
 		self.data = Session.gql("WHERE sid = :1", sid).fetch(1)
-		if len(self.data): 
+		if len(self.data):
+			self.data = self.data[0]
 			self.sid, self.frames = self.data.sid,loads(self.data.frames)
 		else:
 			self.sid, self.frames, self.data = sid,{},Session(sid=sid,frames="{}")
