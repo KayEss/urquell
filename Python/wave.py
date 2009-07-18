@@ -28,28 +28,29 @@ def on_document_changed(properties, context):
   desc_pos = content.rfind('!d')
 
   if exec_pos > -1:
-    handle_exec(blip,content,exec_pos)
+    wavelet = context.GetWaveletById(blip.GetWaveletId())
+    handle_exec(blip,content,exec_pos,wavelet)
   elif desc_pos > -1:
     handle_desc(blip,content,desc_pos)
 
-def handle_exec(blip, content, exec_pos):
-  url_pos = content.rfind('http://')
+def handle_exec(blip, content, exec_pos, wavelet):
+  expr_pos = content.find('http',content.rpartition('!x')[0].rfind('\n'))
   doc = blip.GetDocument()
   stack_frame = u''
   formatted_args = u''
 
   try:
-    expr = content[url_pos:exec_pos]
+    expr = content[expr_pos:exec_pos]
     result = execute(expr)
     if result:
         format = u'%s\nHash: %s     Name: %s     Result: %s\nArgs: %s'
         data = (expr,result['hash'], result['name'], result['value'], ', '.join(result['args']))
         stack_frame =  format % data
-
-        doc.SetTextInRange(document.Range(url_pos,exec_pos + 2), ('%s\n\n%s' % (stack_frame,result['hash'])))
+  
+        doc.SetTextInRange(document.Range(expr_pos,exec_pos + 2), ('%s\n\n%s' % (stack_frame,result['hash'])))
   except Exception, e:
-    doc.deleteRange(document.Range(exec_pos,exec_pos + 2))
-    blip.CreatChild().blip.GetDocument().setText(unicode(e))
+    doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
+    wavelet.CreateBlip().GetDocument().SetText('Exception thrown:\n%s' % unicode(e))
 
 def handle_desc(blip, content, desc_pos):
   pass
