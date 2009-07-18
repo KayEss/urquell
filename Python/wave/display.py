@@ -12,6 +12,7 @@ class Display(object):
 class FrameDisplay(Display):
     def display(self):
         self.doc.Clear()
+        self.doc.AppendText('\n\n')
         format = u'\n%s\nHash: %s     Name: %s     Result: %s\nArgs: %s\n'
         for h,f in self.session.frames.items():
             data = f['url'],f['hash'], f['name'], f['value'], ', '.join(f['args'])
