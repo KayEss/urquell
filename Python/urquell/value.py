@@ -15,7 +15,7 @@ def resolve_part(value):
     if value.startswith('**'):
         value = value[1:]
     elif value.startswith('*'):
-        return resolve_function(value[1:])
+        return resolve_hash(value[1:])
 
     if value.isdigit():
         return (value, int(value))
