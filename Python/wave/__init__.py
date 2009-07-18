@@ -5,14 +5,8 @@ from waveapi import robot
 from waveapi import document
 from google.appengine.api.urlfetch import fetch
 from urquell.invocation import execute
-from wave import session
-
-# import re
-# from uri_validate import absolute_URI
-# URIregex = re.compile(absolute_URI, re.VERBOSE)
-# 
-# import urllib
-# from jsonrpc.json import dumps, loads
+from wave.session import SessionWrapper
+from jsonrpc.json import dumps, loads
 
 class WaveHandler(object):
   content = None
@@ -23,7 +17,7 @@ class WaveHandler(object):
   def on_robot_added(self,properties, context):
     """Invoked when the robot has been added."""
     root_wavelet = context.GetRootWavelet()
-    root_wavelet.CreateBlip().GetDocument().SetText("Urquell calling - !x to execute, !d to describe")
+    root_wavelet.CreateBlip().GetDocument().SetText("Urquell calling - !x to execute")
 
   def on_document_changed(self,properties, context):
     blipid = properties['blipId']
@@ -53,6 +47,11 @@ class WaveHandler(object):
         format = u'%s\nHash: %s     Name: %s     Result: %s\nArgs: %s'
         data = (expr,result['hash'], result['name'], result['value'], ', '.join(result['args']))
         stack_frame =  format % data
+
+        sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
+        sess.frames[result['hash']] = result
+        sess.save()
+		
         doc.SetTextInRange(document.Range(expr_pos,exec_pos + 2), ('%s\n\n%s' % (stack_frame,result['hash'])))
     except Exception, e:
       doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
@@ -65,7 +64,7 @@ def main():
   myRobot = robot.Robot(
       'lurquell',
       image_url='http://urquell-fn.appspot.com/assets/icon.jpg',
-      version='5',
+      version='6',
       profile_url='http://urquell-fn.appspot.com/'
   )
   handler = WaveHandler()
