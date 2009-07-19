@@ -17,19 +17,19 @@ class Invocation(db.Model):
   ihash = db.StringProperty(required=True)
   url = db.StringProperty(required=True)
 
-def invoke(request, module, fn, *path, **kwargs):
+def invoke(responder, module, fn, *path, **kwargs):
     from urquell.value import resolve_part
-    ihash = store_invocation(request.url)
+    ihash = store_invocation(responder.request.url)
     object = {
         'hash': u'*%s' % unicode(ihash),
         'name': '%s/%s' % (module.path(), fn.func_name),
         'path': path,
-        'headers': dict([(k, unicode(v)) for k, v in request.headers.items()]),
+        'headers': dict([(k, unicode(v)) for k, v in responder.request.headers.items()]),
     }
     try:
         call_trace = [resolve_part(str(i)) for i in path]
         kwargs = dict(
-            [(str(k), resolve_part(request.GET[k])) for k in request.GET]
+            [(str(k), resolve_part(responder.request.GET[k])) for k in responder.request.GET]
         )
         args = [x for u, x in call_trace]
         object['args'] = [u for u, x in call_trace]

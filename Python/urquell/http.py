@@ -101,7 +101,7 @@ class Function(Contained):
         )), None, status
 
     def get(self, responder, *path, **kwargs):
-        json, obj = invoke(responder.request, self.container, self.fn, *path, **kwargs)
+        json, obj = invoke(responder, self.container, self.fn, *path, **kwargs)
         if obj.has_key('error'):
             status = 500
         else:
