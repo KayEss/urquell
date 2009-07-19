@@ -37,9 +37,13 @@ class Responder(webapp.RequestHandler):
                 },
             }
         self.response.set_status(self.status)
-        if self.request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
+        if self.request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0 or self.request.GET.has_key('__'):
             self.response.headers['Content-Type'] = 'text/plain'
-            self.response.out.write(dumps(self.object))
+            text = dumps(self.object)
+            if self.request.GET.has_key('__'):
+                self.response.out.write("%s(%s);" % (self.request.GET['__'], text))
+            else:
+                self.response.out.write(text)
         else:
             self.context['result'] = self.object
             self.context['status'] = self.status
