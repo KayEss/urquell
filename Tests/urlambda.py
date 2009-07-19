@@ -17,5 +17,12 @@ class URLParsing(unittest.TestCase):
         self.assertEqual(urlambda('http://www.example.com:456//one').path, ['', 'one'])
         self.assertEqual(urlambda('http://www.example.com:456//one/').path, ['', 'one', ''])
 
+    def test_path_short(self):
+        self.assertEqual(urlambda('http://www.example.com/', 'end').path, ['end'])
+        self.assertEqual(urlambda('http://www.example.com/path', 'end').path, ['path', 'end'])
+        self.assertEqual(urlambda('http://www.example.com:456//', 'end').path, ['', '', 'end'])
+        self.assertEqual(urlambda('http://www.example.com:456//one', 'end').path, ['', 'one', 'end'])
+        self.assertEqual(urlambda('http://www.example.com:456//one/', 'end').path, ['', 'one', '', 'end'])
+
 if __name__ == '__main__':
     unittest.main()
