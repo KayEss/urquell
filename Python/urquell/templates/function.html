@@ -24,18 +24,15 @@
             <dd>{{ result.hash }}</dd>
     </dl>
 
-    <!--h2>Write</h2>
-        <form>
-            <dl>
-                <dt><label for="prefix">Prefix</label></dt>
-                    <dd><input type="text" name="prefix" value="http://urquell-fn.appspot.com/" /></dd>
-                <dt><label for="suffix">Suffix</label></dt>
-                    <dd><input type="text" name="suffix" value="{{ result.hash }}" /></dd>
-            </dl>
-            <input type="submit" value="Create function call" />
-        </form-->
-
-    <h2>Examples</h2>
-        {{ examples }}
+    {% if function.examples %}
+        <h2>Examples</h2>
+        <ol>
+            {% for example in function.examples %}
+                <li><a href="{{ function.path }}/{{ example }}">
+                    {{ function.path }}/{{ example }}
+                </a></li>
+            {% endfor %}
+        </ol>
+    {% endif %}
 
 {% endblock %}

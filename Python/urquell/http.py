@@ -15,7 +15,7 @@ class Responder(webapp.RequestHandler):
             'path': self.request.path,
             'headers': dict([(k, unicode(v)) for k, v in self.request.headers.items()]),
         }
-        self.template = 'urquell/templates/describe.html'
+        self.template = 'urquell/templates/function.html'
         self.context = {}
         self.status = 200
         try:
@@ -122,12 +122,4 @@ class Function(Contained):
 
     def get(self, responder, *path, **kwargs):
         responder.context['function'] = self
-        responder.context['examples'] = template.render('urquell/templates/examples.html', dict(
-            module = self.container,
-            function = self.fn,
-            examples = self.examples
-        ))
-        dict(
-            module = self.container,
-        )
         invoke(responder, self.container, self.fn, *path, **kwargs)
