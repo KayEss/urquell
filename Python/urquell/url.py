@@ -22,3 +22,5 @@ class urlambda(object):
                     self.state[key].append(value)
                 else:
                     self.state[key] = [self.state[key], value]
+        for k, v in kwargs.items():
+            self.state[k] = v
