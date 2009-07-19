@@ -131,6 +131,7 @@ def call_trace(f, *path, **kwargs):
     else:
         return execute(f)
 Function(lib, call_trace, [
+    '*LsRUxMs0/Hello%20world',
 ])
 def call(f, *path, **kwargs):
     """
@@ -142,6 +143,7 @@ def call(f, *path, **kwargs):
         raise ErrorTrace("Function invocation failed", inner)
     return inner['value']
 Function(lib, call, [
+    '*LsRUxMs0/Hello%20world',
 ])
 
 def unresolve(c):
