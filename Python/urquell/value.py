@@ -5,7 +5,7 @@ from google.appengine.api import memcache
 from google.appengine.api.urlfetch import fetch
 from jsonrpc.json import dumps, loads
 
-from urquell.invocation import ErrorTrace, Invocation
+from urquell.invocation import ErrorTrace, Invocation, execute
 
 
 REAL = re.compile('^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$')
