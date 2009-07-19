@@ -12,5 +12,13 @@ class urlambda(object):
             self.path = self.path[1:]
         self.path += list(path)
         # We have to parse the query string
-        self.state = parts[3] or {}
-
+        self.state = {}
+        if parts[3]:
+            for kv in parts[3].split('&'):
+                key, eq, value = kv.partition('=')
+                if not self.state.has_key(key):
+                    self.state[key] = value
+                elif hasattr(self.state[key], 'append'):
+                    self.state[key].append(value)
+                else:
+                    self.state[key] = [self.state[key], value]

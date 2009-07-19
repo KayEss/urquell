@@ -34,6 +34,11 @@ class URLParsing(unittest.TestCase):
     def test_query(self):
         self.assertEqual(urlambda('http://www.example.com/').state, {})
         self.assertEqual(urlambda('http://www.example.com/?k=').state, {'k':''})
+        self.assertEqual(urlambda('http://www.example.com/?k=v').state, {'k':'v'})
+        self.assertEqual(urlambda('http://www.example.com/?k=v&t=34').state, {'k':'v', 't':'34'})
+        self.assertEqual(urlambda('http://www.example.com/?k=&k=v').state, {'k':['', 'v']})
+        self.assertEqual(urlambda('http://www.example.com/?k=&v=k&k=v&k=v').state, {'k':['', 'v', 'v'], 'v':'k'})
+        self.assertEqual(urlambda('http://www.example.com/?k=&v=k&k=v&k=p').state, {'k':['', 'v', 'p'], 'v':'k'})
 
 if __name__ == '__main__':
     unittest.main()
