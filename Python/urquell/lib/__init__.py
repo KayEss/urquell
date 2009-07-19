@@ -144,6 +144,15 @@ def call(f, *path, **kwargs):
 Function(lib, call, [
 ])
 
+def unresolve(c):
+    """
+        <p>Takes a binding code and returns the lambda associated with it. Binding code literals need to be without a leading star.</p>
+    """
+    from urquell.invocation import retrieve_invocation
+    return retrieve_invocation(c)
+Function(lib, unresolve, [
+])
+
 def map(f, *path, **kw):
     """
         <p>Execute the same function across all of the remaining inputs.</p>
