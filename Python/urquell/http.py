@@ -5,7 +5,7 @@ from google.appengine.api import memcache
 
 from jsonrpc.json import dumps, loads
 
-from urquell.invocation import invoke, store_invocation
+from urquell.invocation import ErrorTrace, invoke, store_invocation
 from urquell.value import resolve_part
 
 
@@ -15,12 +15,38 @@ class Responder(webapp.RequestHandler):
             'path': self.request.path,
             'headers': dict([(k, unicode(v)) for k, v in self.request.headers.items()]),
         }
-        #path = [resolve_part(str(i))[1] for i in self.request.path[1:].split('/')]
-        response, mime, status = root.get(self, *self.request.path[1:].split('/'))
-        self.response.set_status(status)
-        if mime:
-            self.response.headers['Content-Type'] = mime
-        self.response.out.write(response)
+        self.template = 'urquell/templates/describe.html'
+        self.context = {}
+        self.status = 200
+        try:
+            #path = [resolve_part(str(i))[1] for i in self.request.path[1:].split('/')]
+            root.get(self, *self.request.path[1:].split('/'))
+        except ErrorTrace, e:
+            self.status = 500
+            self.object['error'] = {
+                'message': e.message,
+                'trace': e.trace
+            }
+        except Exception, e:
+            import traceback
+            self.status = 500
+            self.object['error'] = {
+                'message': unicode(e),
+                'python': {
+                    'call_trace': traceback.format_exc(),
+                },
+            }
+        self.response.set_status(self.status)
+        if self.request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.out.write(dumps(self.object))
+        else:
+            self.context['result'] = self.object
+            self.context['status'] = self.status
+            if self.object.has_key('value'): self.context['value'] = dumps(self.object['value'])
+            self.context['error'] = self.object.get('error', None)
+            self.response.out.write(template.render(self.template, self.context))
+
 
 class EndPoint(object):
     """
@@ -35,21 +61,26 @@ class EndPoint(object):
     def path(self):
         return ''
     def do404(self, responder):
-        return template.render('urquell/templates/404.html', dict(
+        responder.status = 404
+        responder.template = 'urquell/templates/404.html'
+        responder.context = dict(
             path = responder.request.path
-        )), None, 404
+        )
     def route(self, responder, *path, **kwargs):
         name, path = path[0], path[1:]
         function = self.routes.get(name, None)
         if not function:
-            return self.do404(responder)
-        return function.get(responder, *path, **kwargs)
+            self.do404(responder)
+        else:
+            function.get(responder, *path, **kwargs)
     def get(self, responder, *path, **kwargs):
         if len(path):
-            return self.route(responder, *path, **kwargs)
-        return template.render('urquell/templates/homepage.html', dict(
-            modules = self.routes
-        )), None, 200
+            self.route(responder, *path, **kwargs)
+        else:
+            responder.template = 'urquell/templates/homepage.html'
+            responder.context = dict(
+                modules = self.routes
+            )
 
 root = EndPoint(None, None)
 root.routes[''] = root
@@ -72,13 +103,15 @@ class Module(Contained):
         if hasattr(self.container, 'submodules'):
             self.container.submodules.append(self)
 
-    def get(self, request, *path, **kwargs):
+    def get(self, responder, *path, **kwargs):
         if not len(path):
-            return template.render('urquell/templates/module.html', dict(
+            responder.template = 'urquell/templates/module.html'
+            responder.context = dict(
                 module = self,
                 description = self.description
-            )), None, 200
-        return self.route(request, *path, **kwargs)
+            )
+        else:
+            self.route(responder, *path, **kwargs)
 
 class Function(Contained):
     def __init__(self, module, fn, examples = [], func_name = None, func_doc = None):
@@ -87,30 +120,14 @@ class Function(Contained):
         self.fn = fn
         self.examples = examples
 
-    def path(self):
-        return "%s/%s" % (self.container.path(), self.name)
-
-    def describe(self, json, obj, status):
-        return template.render('urquell/templates/describe.html', dict(
-            result = obj,
-            value = dumps(obj.get('value', None)),
-            error = obj.get('error', None),
-            module = self.container,
-            function = self,
-            examples = template.render('urquell/templates/examples.html', dict(
-                module = self.container,
-                function = self.fn,
-                examples = self.examples
-            )),
-        )), None, status
-
     def get(self, responder, *path, **kwargs):
-        json, obj = invoke(responder, self.container, self.fn, *path, **kwargs)
-        if obj.has_key('error'):
-            status = 500
-        else:
-            status = 200
-        if responder.request.headers.get('X-Requested-With', '').find('XMLHttpRequest') >= 0:
-            return json, 'text/plain', status
-        else:
-            return self.describe(json, obj, status)
+        responder.context['function'] = self
+        responder.context['examples'] = template.render('urquell/templates/examples.html', dict(
+            module = self.container,
+            function = self.fn,
+            examples = self.examples
+        ))
+        dict(
+            module = self.container,
+        )
+        invoke(responder, self.container, self.fn, *path, **kwargs)

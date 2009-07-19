@@ -22,24 +22,13 @@ def invoke(responder, module, fn, *path, **kwargs):
     ihash = store_invocation(responder.request.url)
     responder.object['hash'] = u'*%s' % unicode(ihash)
     responder.object['name'] = '%s/%s' % (module.path(), fn.func_name)
-    try:
-        call_trace = [resolve_part(str(i)) for i in path]
-        kwargs = dict(
-            [(str(k), resolve_part(responder.request.GET[k])) for k in responder.request.GET]
-        )
-        args = [x for u, x in call_trace]
-        responder.object['args'] = [u for u, x in call_trace]
-        responder.object['value'] = fn(*args, **kwargs)
-    except ErrorTrace, e:
-        responder.object['error'] = {'message': e.message, 'trace': e.trace}
-    except Exception, e:
-        import traceback
-        responder.object['error'] = {
-            'message': unicode(e),
-            'python': {
-                'call_trace': traceback.format_exc(),
-            },
-        }
+    call_trace = [resolve_part(str(i)) for i in path]
+    kwargs = dict(
+        [(str(k), resolve_part(responder.request.GET[k])) for k in responder.request.GET]
+    )
+    args = [x for u, x in call_trace]
+    responder.object['args'] = [u for u, x in call_trace]
+    responder.object['value'] = fn(*args, **kwargs)
     json = dumps(responder.object)
     if responder.object.has_key('value'):
         memcache.add(ihash, json, 300)
