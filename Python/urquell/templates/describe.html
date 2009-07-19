@@ -10,6 +10,10 @@
         {% if error %}
             <dt>Error</dt>
                 <dd class="Error">{{ error.message|escape }}</dd>
+            {% if error.python %}
+                <dt>Python traceback</dt>
+                    <dd class="Error"><pre>{{ error.python.call_trace|escape }}</pre></dd>
+            {% endif %}
         {% else %}
             <dt>Return value</dt>
                 <dd>{{ value|escape }}</dd>

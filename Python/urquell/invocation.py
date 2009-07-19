@@ -33,7 +33,13 @@ def invoke(responder, module, fn, *path, **kwargs):
     except ErrorTrace, e:
         responder.object['error'] = {'message': e.message, 'trace': e.trace}
     except Exception, e:
-        responder.object['error'] = {'message': unicode(e)}
+        import traceback
+        responder.object['error'] = {
+            'message': unicode(e),
+            'python': {
+                'call_trace': traceback.format_exc(),
+            },
+        }
     json = dumps(responder.object)
     if responder.object.has_key('value'):
         memcache.add(ihash, json, 300)
