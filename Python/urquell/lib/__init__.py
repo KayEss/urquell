@@ -58,8 +58,10 @@ Function(lib, div, [
     '2/3.0/6',
 ])
 
-def ift(c, t = None, *f, **kw):
-    """A conditional which returns its first argument if the condition is met, otherwise it returns all the other arguments."""
+def ift(c, t, *f, **kw):
+    """
+        <p>A conditional which returns its first argument if the condition is met, otherwise it returns all the other arguments.</p>
+    """
     if bool(c):
         return t
     else:
@@ -81,7 +83,9 @@ Function(lib, throw, [
 ])
 
 def fn(server, *path, **kw):
-    """Constructs a function from a server name and a path."""
+    """
+        <p>Constructs a function from a server name and a path.</p>
+    """
     return "http://%s/%s" % (server, path_args(path))
 Function(lib, fn, [
     'urquell-fn.appspot.com/lib/echo/',
@@ -97,7 +101,7 @@ def bind(f, *path, **kwargs):
     """
     if f and len(path):
         for p in path:
-            v = urllib.quote(kwargs.get(p, ''), '')
+            v = urllib.quote(kwargs.get(p, '*'), '')
             if f[-1] == '/':
                 f = '%s%s' % (f, v)
             else:
@@ -108,15 +112,15 @@ def bind(f, *path, **kwargs):
     else:
         return None
 Function(lib, bind, [
-	'*2wuQZl_G/a/b/c',
-	'*-UvxBuFm/a/b/c?a=1&b=2&c=3'
+    '*2wuQZl_G/a/b/c',
+    '*-UvxBuFm/a/b/c?a=1&b=2&c=3'
 ])
 def call_trace(f, *path, **kwargs):
     """
         <p>Execute a function and return all of the debugging information.</p>
     """
-    from urquell.invocation import execute
-    query_string = '&'.join(['%s=%s' % (urllib.quote(k), urllib.quote(v)) for k, v in kwargs.items()])
+    from urquell.invocation import ErrorTrace, execute
+    query_string = '&'.join(['%s=%s' % (urllib.quote(k, '*/'), urllib.quote(v, '*/')) for k, v in kwargs.items()])
     if len(path):
         if f[-1] == '/':
             f = '%s%s' % (f, path_args(path))
@@ -132,7 +136,11 @@ def call(f, *path, **kwargs):
     """
         <p>Execute a function returning just the function's return value.</p>
     """
-    return (call_trace(f, *path, **kwargs) or {}).get('value', None)
+    from urquell.invocation import ErrorTrace
+    inner = call_trace(f, *path, **kwargs)
+    if not inner.has_key('value'):
+        raise ErrorTrace("Function invocation failed", inner)
+    return inner['value']
 Function(lib, call, [
 ])
 

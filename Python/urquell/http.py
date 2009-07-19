@@ -108,7 +108,7 @@ class Module(Contained):
             responder.template = 'urquell/templates/module.html'
             responder.context = dict(
                 module = self,
-                description = self.description
+                description = self.description,
             )
         else:
             self.route(responder, *path, **kwargs)
