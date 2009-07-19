@@ -25,4 +25,4 @@ class FrameDisplay(Display):
         for h,f in self.session.frames.items():
             data = f['url'],f['hash'], f['name'], self.get_result(f), ', '.join(f['args'])
             self.doc.AppendText(format % data)
-        self.doc.AppendText('\n%s' % f['hash'])
+        self.doc.AppendText('\n%s' % 'hash')
