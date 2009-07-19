@@ -17,6 +17,8 @@ class Session(db.Model):
 	# a JSON object whose properties are Urquell invocation hash's, and 
 	# values are call frames.
 	frames = db.TextProperty(required=True)
+	# created timestamp, so we can give a user friendly sid in the blip
+	created = db.DateTimeProperty(auto_now_add=True)
 	# last modified timestamp, so we can cull stale sessions periodically
 	modified = db.DateTimeProperty(auto_now=True)
 

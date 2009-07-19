@@ -39,14 +39,14 @@ class WaveHandler(object):
     formatted_args = u''
 
     try:
+      sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
       expr = self.content[expr_pos:exec_pos]
       result = execute(expr)
       if result:
         result['url'] = expr
-        sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
         sess.frames[result['hash']] = result
         sess.save()
-        FrameDisplay(self.blip,sess).display()
+      FrameDisplay(self.blip,sess).display()
     except Exception, e:
       doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
       self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % unicode(e))

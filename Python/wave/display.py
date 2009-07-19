@@ -12,7 +12,7 @@ class Display(object):
         self.session = session
         self.doc.Clear()
         if not self.blip.IsRoot(): self.doc.AppendText('\n')
-        self.doc.AppendText('%s\n' % self.session.sid)
+        self.doc.AppendText('Urquell Session - %s\n' % self.session.data.created.strftime('%Y.%m.%d - %H:%M'))
 
 class FrameDisplay(Display):
     def display(self):
