@@ -43,7 +43,8 @@ class Responder(webapp.RequestHandler):
         else:
             self.context['result'] = self.object
             self.context['status'] = self.status
-            if self.object.has_key('value'): self.context['value'] = dumps(self.object['value'])
+            if self.object.has_key('value'):
+                self.context['value'] = dumps(self.object['value'])
             self.context['error'] = self.object.get('error', None)
             self.response.out.write(template.render(self.template, self.context))
 
@@ -74,16 +75,20 @@ class EndPoint(object):
         else:
             function.get(responder, *path, **kwargs)
     def get(self, responder, *path, **kwargs):
-        if len(path):
-            self.route(responder, *path, **kwargs)
-        else:
+        if len(path) == 1 and not path[0]:
+            responder.object['value'] = {
+                "modules": [{
+                    'name': m.name,
+                } for k, m in self.routes.items()],
+            }
             responder.template = 'urquell/templates/homepage.html'
             responder.context = dict(
                 modules = self.routes
             )
+        else:
+            self.route(responder, *path, **kwargs)
 
 root = EndPoint(None, None)
-root.routes[''] = root
 
 
 class Contained(EndPoint):
@@ -105,6 +110,14 @@ class Module(Contained):
 
     def get(self, responder, *path, **kwargs):
         if not len(path):
+            responder.object['value'] = {
+                'modules': [{
+                    'name': m.name,
+                } for m in self.submodules],
+                'functions': [{
+                    'name': f.name,
+                } for f in self.functions],
+            }
             responder.template = 'urquell/templates/module.html'
             responder.context = dict(
                 module = self,
