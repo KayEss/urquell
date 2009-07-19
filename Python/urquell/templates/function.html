@@ -16,6 +16,10 @@
                 <dt>Python traceback</dt>
                     <dd class="Error"><pre>{{ error.python.call_trace|escape }}</pre></dd>
             {% endif %}
+            {% if error.trace %}
+                <dt>Inner trace</dt>
+                    <dd>{{ error.trace }}</dd>
+            {% endif %}
         {% else %}
             <dt>Return value</dt>
                 <dd>{{ value|escape }}</dd>
