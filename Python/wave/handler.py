@@ -46,7 +46,7 @@ class WaveHandler(object):
         sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
         sess.frames[result['hash']] = result
         sess.save()
-        FrameDisplay(doc,sess).display()
+        FrameDisplay(self.blip,sess).display()
     except Exception, e:
       doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
       self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % unicode(e))

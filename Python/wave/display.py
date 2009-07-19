@@ -2,17 +2,20 @@
 from waveapi import document
 
 class Display(object):
+    blip = None
     doc = None
     session = None
 
-    def __init__(self,doc,session):
-        self.doc = doc
+    def __init__(self,blip,session):
+        self.blip = blip
+        self.doc = blip.GetDocument()
         self.session = session
+        self.doc.Clear()
+        if not self.blip.IsRoot(): self.doc.AppendText('\n')
+        self.doc.AppendText('%s\n' % self.session.sid)
 
 class FrameDisplay(Display):
     def display(self):
-        self.doc.Clear()
-        self.doc.AppendText('\n\n')
         format = u'\n%s\nHash: %s     Name: %s     Result: %s\nArgs: %s\n'
         for h,f in self.session.frames.items():
             data = f['url'],f['hash'], f['name'], f['value'], ', '.join(f['args'])
