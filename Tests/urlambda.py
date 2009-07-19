@@ -31,5 +31,9 @@ class URLParsing(unittest.TestCase):
         self.assertEqual(urlambda('http://www.example.com:456//one', 'earlier', 'end').path, ['', 'one', 'earlier', 'end'])
         self.assertEqual(urlambda('http://www.example.com:456//one/', 'earlier', 'end').path, ['', 'one', '', 'earlier', 'end'])
 
+    def test_query(self):
+        self.assertEqual(urlambda('http://www.example.com/').state, {})
+        self.assertEqual(urlambda('http://www.example.com/?k=').state, {'k':''})
+
 if __name__ == '__main__':
     unittest.main()
