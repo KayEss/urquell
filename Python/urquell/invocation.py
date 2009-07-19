@@ -20,28 +20,24 @@ class Invocation(db.Model):
 def invoke(responder, module, fn, *path, **kwargs):
     from urquell.value import resolve_part
     ihash = store_invocation(responder.request.url)
-    object = {
-        'hash': u'*%s' % unicode(ihash),
-        'name': '%s/%s' % (module.path(), fn.func_name),
-        'path': path,
-        'headers': dict([(k, unicode(v)) for k, v in responder.request.headers.items()]),
-    }
+    responder.object['hash'] = u'*%s' % unicode(ihash)
+    responder.object['name'] = '%s/%s' % (module.path(), fn.func_name)
     try:
         call_trace = [resolve_part(str(i)) for i in path]
         kwargs = dict(
             [(str(k), resolve_part(responder.request.GET[k])) for k in responder.request.GET]
         )
         args = [x for u, x in call_trace]
-        object['args'] = [u for u, x in call_trace]
-        object['value'] = fn(*args, **kwargs)
+        responder.object['args'] = [u for u, x in call_trace]
+        responder.object['value'] = fn(*args, **kwargs)
     except ErrorTrace, e:
-        object['error'] = {'message': e.message, 'trace': e.trace}
+        responder.object['error'] = {'message': e.message, 'trace': e.trace}
     except Exception, e:
-        object['error'] = {'message': unicode(e)}
-    json = dumps(object)
-    if object.has_key('value'):
+        responder.object['error'] = {'message': unicode(e)}
+    json = dumps(responder.object)
+    if responder.object.has_key('value'):
         memcache.add(ihash, json, 300)
-    return json, object
+    return json, responder.object
 
 def execute(url):
     if url:

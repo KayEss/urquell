@@ -11,6 +11,10 @@ from urquell.value import resolve_part
 
 class Responder(webapp.RequestHandler):
     def get(self):
+        self.object = {
+            'path': self.request.path,
+            'headers': dict([(k, unicode(v)) for k, v in self.request.headers.items()]),
+        }
         #path = [resolve_part(str(i))[1] for i in self.request.path[1:].split('/')]
         response, mime, status = root.get(self, *self.request.path[1:].split('/'))
         self.response.set_status(status)
