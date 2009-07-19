@@ -132,6 +132,7 @@ def call_trace(f, *path, **kwargs):
         return execute(f)
 Function(lib, call_trace, [
     '*LsRUxMs0/Hello%20world',
+    '*N698-V54/lib',
 ])
 def call(f, *path, **kwargs):
     """
@@ -144,6 +145,7 @@ def call(f, *path, **kwargs):
     return inner['value']
 Function(lib, call, [
     '*LsRUxMs0/Hello%20world',
+    '*N698-V54/lib/http',
 ])
 
 def unresolve(c):
@@ -153,6 +155,8 @@ def unresolve(c):
     from urquell.invocation import retrieve_invocation
     return retrieve_invocation(c)
 Function(lib, unresolve, [
+    'LsRUxMs0',
+    'N698-V54',
 ])
 
 def map(f, *path, **kw):
