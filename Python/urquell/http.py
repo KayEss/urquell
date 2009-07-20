@@ -65,7 +65,13 @@ class EndPoint(object):
 
     def path(self):
         return ''
-    def do404(self, responder):
+    def do404(self, responder, requested = None):
+        responder.object['error'] = {
+            'message': "Urquell function or module not found",
+            "options": self.routes.keys(),
+        }
+        if requested:
+            responder.object['error']['requested'] = requested
         responder.status = 404
         responder.template = 'urquell/templates/404.html'
         responder.context = dict(
@@ -75,7 +81,7 @@ class EndPoint(object):
         name, path = path[0], path[1:]
         function = self.routes.get(name, None)
         if not function:
-            self.do404(responder)
+            self.do404(responder, name)
         else:
             function.get(responder, *path, **kwargs)
     def get(self, responder, *path, **kwargs):
