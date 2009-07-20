@@ -42,10 +42,13 @@ class WaveHandler(object):
       sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
       expr = self.content[expr_pos:exec_pos]
       result = execute(expr)
-      if result:
+      if result and result.has_key('hash'):
         result['url'] = expr
         sess.frames[result['hash']] = result
         sess.save()
+      elif result:
+        data = result['headers']['Host'],result['path'],result['error']['message']
+        self.wavelet.CreateBlip().GetDocument().SetText('\n\nExecution error:\nHost: %s\nPath: %s\nError: %s' % data)        
       FrameDisplay(self.blip,sess).display()
     except Exception, e:
       doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
