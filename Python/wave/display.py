@@ -17,11 +17,12 @@ class Display(object):
 
 class FrameDisplay(Display):
     def display(self):
+        output = ''
         format = u'\n%s\nHash: %s     Name: %s     Result: %s\nArgs: %s\n'
         for h,f in reversed(self.session.frames.items()):
             data = f['url'],f.get('hash','None'), f['name'], self.session.get_result(f), ', '.join(f['args'])
-            self.doc.AppendText(format % data)
-        self.doc.AppendText('\n%s' % self.session.frames.keys()[0] if self.session.frames.keys() else '')
+            output += (format % data)
+        self.doc.AppendText(output)
 
 class ModuleDisplay(Display):
 	def display(self,frame):

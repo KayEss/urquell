@@ -16,7 +16,7 @@ class WaveHandler(object):
   def on_robot_added(self,properties, context):
     """Invoked when the robot has been added."""
     root_wavelet = context.GetRootWavelet()
-    root_wavelet.CreateBlip().GetDocument().SetText("Urquell calling - !x to execute")
+    root_wavelet.CreateBlip().GetDocument().SetText("Urquell calling - !x to execute !reset to reset session.")
 
   def on_document_changed(self,properties, context):
     blipid = properties['blipId']
@@ -26,12 +26,12 @@ class WaveHandler(object):
     self.wave = context.GetWaveById(self.blip.GetWaveId())
 	
     exec_pos = self.content.rfind('!x')
-    desc_pos = self.content.rfind('!d')
+    rset_pos = self.content.rfind('!reset')
 
     if exec_pos > -1:
       self.handle_exec(exec_pos)
-    elif desc_pos > -1:
-      self.handle_desc(desc_pos)
+    elif rset_pos > -1:
+      self.handle_rset(rset_pos)
 
   def handle_exec(self,exec_pos):
     doc = self.blip.GetDocument()
@@ -48,6 +48,7 @@ class WaveHandler(object):
         sess.frames[result['hash']] = result
         sess.save()
         FrameDisplay(self.blip,sess).display()
+        doc.AppendText('\n%s' % result['hash'])
       elif result and result.has_key('value'):
         ModuleDisplay(self.blip,sess).display(result)
         doc.AppendText('\n%s' % expr)
@@ -58,3 +59,10 @@ class WaveHandler(object):
     except Exception, e:
       doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
       self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % traceback.format_exc())
+
+  def handle_rset(self,rset_pos):
+    sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
+    sess.frames = {}
+    sess.save()
+    FrameDisplay(self.blip,sess).display()
+    
