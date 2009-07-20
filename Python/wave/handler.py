@@ -4,6 +4,7 @@ from waveapi import document
 from urquell.invocation import execute
 from wave.session import SessionWrapper
 from wave.display import FrameDisplay
+from wave.display import ModuleDisplay
 import traceback
 
 class WaveHandler(object):
@@ -46,10 +47,14 @@ class WaveHandler(object):
         result['url'] = expr
         sess.frames[result['hash']] = result
         sess.save()
-      elif result:
+        FrameDisplay(self.blip,sess).display()
+      elif result and result.has_key('value'):
+        ModuleDisplay(self.blip,sess).display(result)
+        doc.AppendText('\n%s' % expr)
+      elif result and result.has_key('error'):
         data = result['headers']['Host'],result['path'],result['error']['message']
-        self.wavelet.CreateBlip().GetDocument().SetText('\n\nExecution error:\nHost: %s\nPath: %s\nError: %s' % data)        
-      FrameDisplay(self.blip,sess).display()
+        self.wavelet.CreateBlip().GetDocument().SetText('\n\nExecution error:\nHost: %s\nPath: %s\nError: %s' % data)
+        FrameDisplay(self.blip,sess).display()
     except Exception, e:
       doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
       self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % traceback.format_exc())
