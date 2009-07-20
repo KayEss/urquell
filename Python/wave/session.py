@@ -38,3 +38,9 @@ class SessionWrapper(object):
 	def save(self):
 		self.data.frames = dumps(self.frames)
 		db.put(self.data)
+
+	def get_result(self,frame):
+		if frame.has_key('value'): return frame['value']
+		if frame.has_key('error'): return frame['error']['message']
+		return 'None'
+	

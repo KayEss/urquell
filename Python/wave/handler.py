@@ -4,7 +4,7 @@ from waveapi import document
 from urquell.invocation import execute
 from wave.session import SessionWrapper
 from wave.display import FrameDisplay
-import sys
+import traceback
 
 class WaveHandler(object):
   content = None
@@ -49,4 +49,4 @@ class WaveHandler(object):
       FrameDisplay(self.blip,sess).display()
     except Exception, e:
       doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
-      self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % unicode(e))
+      self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % traceback.format_exc())
