@@ -46,5 +46,16 @@ class URLParsing(unittest.TestCase):
         self.assertEqual(urlambda('http://www.example.com/?k=v', k=4).state, {'k':4})
         self.assertEqual(urlambda('http://www.example.com/?k=v&t=34', x=4, t=[]).state, {'k':'v', 't':[], 'x':4})
 
+    def test_processing(self):
+        url = urlambda('http://www.example.com/')
+        self.assertEqual(urlambda(url.prefix, *url.path, **url.state), url)
+        url.path += ['another']
+        self.assertEqual(urlambda(url.prefix, *url.path, **url.state), url)
+
+    def test_representation(self):
+        self.assertEqual(repr(urlambda('http://www.example.com/')), 'http://www.example.com/')
+        self.assertEqual(repr(urlambda('http://www.example.com/path')), 'http://www.example.com/path')
+
+
 if __name__ == '__main__':
     unittest.main()

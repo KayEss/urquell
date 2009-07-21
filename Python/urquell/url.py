@@ -24,3 +24,9 @@ class urlambda(object):
                     self.state[key] = [self.state[key], value]
         for k, v in kwargs.items():
             self.state[k] = v
+
+    def __repr__(self):
+        return self.prefix
+
+    def __eq__(self, other):
+        return self.prefix == other.prefix and self.path == other.path and self.state == other.state
