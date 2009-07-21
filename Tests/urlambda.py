@@ -55,6 +55,8 @@ class URLParsing(unittest.TestCase):
     def test_representation(self):
         self.assertEqual(repr(urlambda('http://www.example.com/')), 'http://www.example.com/')
         self.assertEqual(repr(urlambda('http://www.example.com/path')), 'http://www.example.com/path')
+        self.assertEqual(repr(urlambda('http://www.example.com/path/path/')), 'http://www.example.com/path/path/')
+        self.assertEqual(repr(urlambda('http://www.example.com/path/path/p%20s')), 'http://www.example.com/path/path/p%20s')
 
 
 if __name__ == '__main__':

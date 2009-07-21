@@ -26,7 +26,8 @@ class urlambda(object):
             self.state[k] = v
 
     def __repr__(self):
-        return self.prefix
+        path = '/'.join([p for p in self.path])
+        return self.prefix + path
 
     def __eq__(self, other):
         return self.prefix == other.prefix and self.path == other.path and self.state == other.state
