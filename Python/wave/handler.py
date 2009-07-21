@@ -15,9 +15,11 @@ class WaveHandler(object):
 
   def on_robot_added(self,properties, context):
     """Invoked when the robot has been added."""
-    root_wavelet = context.GetRootWavelet()
-    root_wavelet.CreateBlip().GetDocument().SetText("Urquell calling - !x to execute !reset to reset session.")
-
+    doc = context.GetRootWavelet().CreateBlip().GetDocument()
+    welcome = "Urquell calling - !x to execute !reset to reset session."
+    doc.SetText(welcome)
+    doc.InsertElement(len(welcome),document.Gadget('http://urquell-fn.appspot.com/assets/wave-gadget.xml'))
+	
   def on_document_changed(self,properties, context):
     blipid = properties['blipId']
     self.blip = context.GetBlipById(blipid)
