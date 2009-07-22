@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import urllib
+from waveapi.simplejson import dumps
+
 from urquell.http import Module, Function, root
 from urquell.value import path_args
-from jsonrpc.json import dumps
-import urllib
+
 
 lib = Module(root, 'lib', """
     <p>A general purpose library providing a number of useful functions.</p>

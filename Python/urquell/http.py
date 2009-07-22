@@ -3,7 +3,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.api import memcache
 
-from jsonrpc.json import dumps, loads
+from waveapi.simplejson import dumps, loads
 
 from urquell.invocation import ErrorTrace, invoke, store_invocation
 from urquell.value import resolve_part

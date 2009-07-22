@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from google.appengine.ext import db
-from jsonrpc.json import dumps, loads
+
+from waveapi.simplejson import dumps, loads
+
 
 """
 Example record
@@ -14,7 +16,7 @@ frames: '{'*hygt3td6': {value:{},.. },'*uh1i9d65': {error:.. },.. }'
 class Session(db.Model):
 	# a globally unique identifier composed of a wave id, and a blip id
 	sid = db.StringProperty(required=True)
-	# a JSON object whose properties are Urquell invocation hash's, and 
+	# a JSON object whose properties are Urquell invocation hash's, and
 	# values are call frames.
 	frames = db.TextProperty(required=True)
 	# created timestamp, so we can give a user friendly sid in the blip
@@ -26,15 +28,15 @@ class SessionWrapper(object):
 	sid = None
 	frames = None
 	data = None
-	
-	def __init__(self,sid):	
+
+	def __init__(self,sid):
 		self.data = Session.gql("WHERE sid = :1", sid).fetch(1)
 		if len(self.data):
 			self.data = self.data[0]
 			self.sid, self.frames = self.data.sid,loads(self.data.frames)
 		else:
 			self.sid, self.frames, self.data = sid,{},Session(sid=sid,frames="{}")
-			
+
 	def save(self):
 		self.data.frames = dumps(self.frames)
 		db.put(self.data)
@@ -43,4 +45,3 @@ class SessionWrapper(object):
 		if frame.has_key('value'): return frame['value']
 		if frame.has_key('error'): return frame['error']['message']
 		return 'None'
-	
