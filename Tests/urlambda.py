@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys, unittest
 sys.path.append('../Python')
+sys.path.append('../../google_appengine')
+
 
 from urquell.url import urlambda
 
@@ -57,7 +59,7 @@ class URLParsing(unittest.TestCase):
         self.assertEqual(repr(urlambda('http://www.example.com/path')), 'http://www.example.com/path')
         self.assertEqual(repr(urlambda('http://www.example.com/path/path/')), 'http://www.example.com/path/path/')
         self.assertEqual(repr(urlambda('http://www.example.com/path/path/p%20s')), 'http://www.example.com/path/path/p%20s')
-
+        self.assertEqual(repr(urlambda('http://www.example.com/', 20)), 'http://www.example.com/20')
 
 if __name__ == '__main__':
     unittest.main()

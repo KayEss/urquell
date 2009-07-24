@@ -68,3 +68,18 @@ def execute(url):
             raise Exception(json)
     else:
         return None
+
+def resolve_hash(value):
+    dest = Invocation.gql("WHERE ihash = :1", value).fetch(1)
+    if not len(dest):
+        raise ErrorTrace("Unable to resolve function invocation. Invocation hash: %s" % value)
+    url = dest[0].url
+    json = memcache.get(value)
+    if not json:
+        rvalue = execute(url)
+    else:
+        rvalue = loads(json)
+    if rvalue.has_key('value'):
+        return url, rvalue['value']
+    else:
+        raise ErrorTrace("Whilst resolving binding value %s" % value, rvalue)
