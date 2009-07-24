@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re, os, urllib, urlparse
-from value import resolve_part
+from waveapi.simplejson import dumps, loads
+from value import resolve_part, unresolve_part
 
 
 class urlambda(object):
@@ -28,12 +29,7 @@ class urlambda(object):
             self.state[k] = v
 
     def __repr__(self):
-        def pathize(i):
-            if str(i) == i and len(i) and i[0] != '*':
-                return urllib.quote(str(i))
-            else:
-                return urllib.quote(unicode(i))
-        path = '/'.join([pathize(p) for p in self.path])
+        path = '/'.join([unresolve_part(p) for p in self.path])
         return self.prefix + path
 
     def __eq__(self, other):

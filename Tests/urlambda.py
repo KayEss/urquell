@@ -54,12 +54,26 @@ class URLParsing(unittest.TestCase):
         url.path += ['another']
         self.assertEqual(urlambda(url.prefix, *url.path, **url.state), url)
 
-    def test_representation(self):
-        self.assertEqual(repr(urlambda('http://www.example.com/')), 'http://www.example.com/')
-        self.assertEqual(repr(urlambda('http://www.example.com/path')), 'http://www.example.com/path')
-        self.assertEqual(repr(urlambda('http://www.example.com/path/path/')), 'http://www.example.com/path/path/')
-        self.assertEqual(repr(urlambda('http://www.example.com/path/path/p%20s')), 'http://www.example.com/path/path/p%20s')
-        self.assertEqual(repr(urlambda('http://www.example.com/', 20)), 'http://www.example.com/20')
+    def test_representation_simple(self):
+        self.roundtrip('http://www.example.com/', 'http://www.example.com/')
+        self.roundtrip('http://www.example.com/path', 'http://www.example.com/path')
+        self.roundtrip('http://www.example.com/path/path/', 'http://www.example.com/path/path/')
+        self.roundtrip('http://www.example.com/path/path/p%20s', 'http://www.example.com/path/path/p%20s')
+        self.roundtrip('http://www.example.com/20', 'http://www.example.com/', 20)
+        self.roundtrip('http://www.example.com/20.25/3', 'http://www.example.com/', 20.25, 3)
+
+    def test_representation_list(self):
+        self.roundtrip('http://www.example.com/%5B%5D', 'http://www.example.com/', [])
+        self.roundtrip('http://www.example.com/%5B20%5D', 'http://www.example.com/', [20])
+        self.roundtrip('http://www.example.com/%5B%22hello%22%5D', 'http://www.example.com/', ["hello"])
+        self.roundtrip('http://www.example.com/%5B%22hello%22%5D', 'http://www.example.com/', ("hello",))
+
+    def roundtrip(self, stringed, prefix, *path, **kwargs):
+        """
+            This abstracted test checks that we have proper round trips for various kinds of URL
+        """
+        self.assertEqual(stringed, repr(urlambda(stringed)))
+        self.assertEqual(stringed, repr(urlambda(prefix, *path, **kwargs)))
 
 if __name__ == '__main__':
     unittest.main()
