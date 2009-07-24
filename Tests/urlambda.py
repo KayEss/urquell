@@ -66,7 +66,7 @@ class URLParsing(unittest.TestCase):
         self.roundtrip('http://www.example.com/%5B%5D', 'http://www.example.com/', [])
         self.roundtrip('http://www.example.com/%5B20%5D', 'http://www.example.com/', [20])
         self.roundtrip('http://www.example.com/%5B%22hello%22%5D', 'http://www.example.com/', ["hello"])
-        self.roundtrip('http://www.example.com/%5B%22hello%22%5D', 'http://www.example.com/', ("hello",))
+        self.roundtrip('http://www.example.com/%5B%22hello%22%2C%2030%5D', 'http://www.example.com/', ["hello", 30])
 
     def roundtrip(self, stringed, prefix, *path, **kwargs):
         """
@@ -74,6 +74,7 @@ class URLParsing(unittest.TestCase):
         """
         self.assertEqual(stringed, repr(urlambda(stringed)))
         self.assertEqual(stringed, repr(urlambda(prefix, *path, **kwargs)))
+        self.assertEqual(urlambda(stringed).path, urlambda(prefix, *path, **kwargs).path)
 
 if __name__ == '__main__':
     unittest.main()

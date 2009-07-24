@@ -10,8 +10,8 @@ class urlambda(object):
         # Prefix is easy
         self.prefix = '%s://%s/' % (parts[0], parts[1])
         # The path needs to be appended in the right way
-        self.path = [resolve_part(p)[0] for p in parts[2][1:].split('/')]
-        if len(self.path) == 1 and not self.path[0]:
+        self.path = [resolve_part(p)[1] for p in parts[2][1:].split('/')]
+        if len(self.path) == 1 and self.path[0] == '':
             self.path = self.path[1:]
         self.path += list(path)
         # We have to parse the query string
