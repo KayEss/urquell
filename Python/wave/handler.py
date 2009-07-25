@@ -31,7 +31,7 @@ class WaveHandler(object):
     
     if last_line.find('http') > -1:
       self.handle_expr(last_line)
-    if last_line.find('*') > -1:
+    elif last_line.find('*') > -1:
       self.handle_hash(last_line)	
     elif last_line.find('!') > -1:
       self.handle_cmnd(last_line)
@@ -46,6 +46,7 @@ class WaveHandler(object):
       result = execute(expr)
       if result and result.has_key('hash'):
         result['url'] = expr
+        result['fnum'] = sess.last_fnum() + 1
         sess.frames[result['hash']] = result
         sess.save()
         FrameDisplay(self.blip,sess).display()

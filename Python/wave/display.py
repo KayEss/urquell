@@ -19,7 +19,7 @@ class FrameDisplay(Display):
     def display(self):
         output = ''
         format = u'\n%s\nHash: %s     Result: %s\nName: %s     Args: %s\n'
-        for h,f in reversed(self.session.frames.items()):
+        for f in self.session.ordered_frames():
             data = f['url'],f.get('hash','None'), self.session.get_result(f), f['name'], ', '.join(f['args'])
             output += (format % data)
         self.doc.AppendText(output)

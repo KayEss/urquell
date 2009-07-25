@@ -45,3 +45,12 @@ class SessionWrapper(object):
 		if frame.has_key('value'): return frame['value']
 		if frame.has_key('error'): return frame['error']['message']
 		return 'None'
+
+	def ordered_frames(self):
+		frames = self.frames.items()
+		frames.sort(lambda x,y: cmp(x[1]['fnum'],y[1]['fnum']))
+		return [value for key, value in frames]
+
+	def last_fnum(self):
+		if not len(self.frames): return 0
+		return self.ordered_frames()[-1].get('fnum',0)
