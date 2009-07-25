@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
-import re, os, urllib
-
+import urllib
 from waveapi.simplejson import dumps, loads
-
-
-REAL = re.compile('^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$')
 
 
 def resolve_part(value):
