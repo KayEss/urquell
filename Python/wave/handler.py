@@ -60,12 +60,22 @@ class WaveHandler(object):
     except Exception, e:
       self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % traceback.format_exc())
 
-  def handle_hash(self,hash):
-    pass
+  def handle_hash(self,ihash):
+    doc = self.blip.GetDocument()
+    url = u''
 
+    try:
+      sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
+      result = execute('http://urquell-fn.appspot.com/lib/unresolve/' + ihash[1:])
+      FrameDisplay(self.blip,sess).display()
+      if result and result.has_key('hash'):
+        doc.AppendText('\n%s resolves to: %s' % (ihash,result.get('value','None')))
+    except Exception, e:
+      self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % traceback.format_exc())
+	
   def handle_cmnd(self,cmnd):
-    sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
-    sess.frames = {}
-    sess.save()
-    FrameDisplay(self.blip,sess).display()
-    
+    if cmnd == '!reset':
+      sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
+      sess.frames = {}
+      sess.save()
+    FrameDisplay(self.blip,sess).display()    
