@@ -19,6 +19,7 @@ class urlambda(object):
         if parts[3]:
             for kv in parts[3].split('&'):
                 key, eq, value = kv.partition('=')
+                key, value = resolve_part(key)[1], resolve_part(value)[1]
                 if not self.state.has_key(key):
                     self.state[key] = value
                 elif hasattr(self.state[key], 'append'):
@@ -30,7 +31,11 @@ class urlambda(object):
 
     def __repr__(self):
         path = '/'.join([unresolve_part(p) for p in self.path])
-        return self.prefix + path
+        query = '&'.join(['%s=%s' % (unresolve_part(k), unresolve_part(v)) for k, v in self.state.items()])
+        if query:
+            return self.prefix + path + '?' + query
+        else:
+            return self.prefix + path
 
     def __eq__(self, other):
         return self.prefix == other.prefix and self.path == other.path and self.state == other.state

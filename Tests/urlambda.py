@@ -37,7 +37,7 @@ class URLParsing(unittest.TestCase):
         self.assertEqual(urlambda('http://www.example.com/').state, {})
         self.assertEqual(urlambda('http://www.example.com/?k=').state, {'k':''})
         self.assertEqual(urlambda('http://www.example.com/?k=v').state, {'k':'v'})
-        self.assertEqual(urlambda('http://www.example.com/?k=v&t=34').state, {'k':'v', 't':'34'})
+        self.assertEqual(urlambda('http://www.example.com/?k=v&t=34').state, {'k':'v', 't':34})
         self.assertEqual(urlambda('http://www.example.com/?k=&k=v').state, {'k':['', 'v']})
         self.assertEqual(urlambda('http://www.example.com/?k=&v=k&k=v&k=v').state, {'k':['', 'v', 'v'], 'v':'k'})
         self.assertEqual(urlambda('http://www.example.com/?k=&v=k&k=v&k=p').state, {'k':['', 'v', 'p'], 'v':'k'})
@@ -71,6 +71,12 @@ class URLParsing(unittest.TestCase):
     def test_representation_object(self):
         self.roundtrip('http://www.example.com/%7B%7D', 'http://www.example.com/', {})
         self.roundtrip('http://www.example.com/%7B%22k%22%3A%20%22v%22%7D', 'http://www.example.com/', dict(k='v'))
+
+    def test_representation_state(self):
+        self.roundtrip('http://www.example.com/', 'http://www.example.com/', **{})
+        self.roundtrip('http://www.example.com/?k=v', 'http://www.example.com/', k='v')
+        self.roundtrip('http://www.example.com/?k=23', 'http://www.example.com/', k=23)
+        self.roundtrip('http://www.example.com/?k=%5B%5D', 'http://www.example.com/', k=[])
 
     def roundtrip(self, stringed, prefix, *path, **kwargs):
         """
