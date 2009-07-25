@@ -3,7 +3,6 @@ import urllib
 from waveapi.simplejson import dumps
 
 from urquell.http import Module, Function, root
-from urquell.value import path_args
 
 
 lib = Module(root, 'lib', """
