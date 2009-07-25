@@ -54,7 +54,7 @@ class WaveHandler(object):
         doc.AppendText('\nhttp://urquell-fn.appspot.com/lib %s' % result['hash'])
       elif result and result.has_key('value'):
         ModuleDisplay(self.blip,sess).display(result)
-        doc.AppendText('\n%s' % expr)
+        doc.AppendText('\n\n%s' % expr)
       elif result and result.has_key('error'):
         data = result['headers']['Host'],result['path'],result['error']['message']
         self.wavelet.CreateBlip().GetDocument().SetText('\n\nExecution error:\nHost: %s\nPath: %s\nError: %s' % data)
