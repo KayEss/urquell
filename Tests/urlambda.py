@@ -54,6 +54,10 @@ class URLParsing(unittest.TestCase):
         url.path += ['another']
         self.assertEqual(urlambda(url.prefix, *url.path, **url.state), url)
 
+        url = urlambda(u'http://urquell-fn.appspot.com/lib/echo')
+        url.path.append('h')
+        self.assertEqual(repr(url), 'http://urquell-fn.appspot.com/lib/echo/h')
+
     def test_representation_simple(self):
         self.roundtrip('http://www.example.com/', 'http://www.example.com/')
         self.roundtrip('http://www.example.com/path', 'http://www.example.com/path')

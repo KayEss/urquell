@@ -22,7 +22,7 @@ def unresolve_part(part):
     if type(part) == str or type(part) == unicode:
         if not len(part):
             return ''
-        elif type(part) == str and part[0] != '*':
+        elif part[0] != '*':
             return urllib.quote(part, '')
         else:
             return urllib.quote(dumps(part), '')
