@@ -20,7 +20,7 @@ class Responder(webapp.RequestHandler):
         self.status = 200
         try:
             path = [resolve_part(str(i))[1] for i in self.request.path[1:].split('/')]
-            kwargs = dict([(resolve_part(k), resolve_part(v)) for k, v in self.request.GET])
+            kwargs = dict([(str(resolve_part(k)[1]), resolve_part(v)[1]) for k, v in self.request.GET.items()])
             root.get(self, *path, **kwargs)
         except ErrorTrace, e:
             self.status = 500

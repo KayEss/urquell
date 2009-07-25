@@ -46,9 +46,6 @@ def invoke(responder, module, fn, *path, **kwargs):
     responder.object['hash'] = u'*%s' % unicode(ihash)
     responder.object['name'] = '%s/%s' % (module.path(), fn.func_name)
     call_trace = [resolve_part(str(i)) for i in path]
-    kwargs = dict(
-        [(str(k), resolve_part(responder.request.GET[k])) for k in responder.request.GET]
-    )
     args = [x for u, x in call_trace]
     responder.object['args'] = [u for u, x in call_trace]
     responder.object['value'] = fn(*args, **kwargs)
