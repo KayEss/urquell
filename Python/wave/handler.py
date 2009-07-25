@@ -20,30 +20,29 @@ class WaveHandler(object):
     doc.SetText(welcome)
     doc.InsertElement(len(welcome),document.Gadget('http://urquell-fn.appspot.com/assets/wave-gadget.xml'))
 	
-  def on_document_changed(self,properties, context):
+  def on_blip_submitted(self,properties, context):
     blipid = properties['blipId']
     self.blip = context.GetBlipById(blipid)
     self.content = self.blip.GetDocument().GetText()
     self.wavelet = context.GetWaveletById(self.blip.GetWaveletId())
     self.wave = context.GetWaveById(self.blip.GetWaveId())
 	
-    exec_pos = self.content.rfind('!x')
-    rset_pos = self.content.rfind('!reset')
+    last_line = self.content.strip().split('\n')[-1].strip()
+    
+    if last_line.find('http') > -1:
+      self.handle_expr(last_line)
+    if last_line.find('*') > -1:
+      self.handle_hash(last_line)	
+    elif last_line.find('!') > -1:
+      self.handle_cmnd(last_line)
 
-    if exec_pos > -1:
-      self.handle_exec(exec_pos)
-    elif rset_pos > -1:
-      self.handle_rset(rset_pos)
-
-  def handle_exec(self,exec_pos):
+  def handle_expr(self,expr):
     doc = self.blip.GetDocument()
-    expr_pos = self.content.find('http',self.content.rpartition('!x')[0].rfind('\n'))
     stack_frame = u''
     formatted_args = u''
 
     try:
       sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
-      expr = self.content[expr_pos:exec_pos]
       result = execute(expr)
       if result and result.has_key('hash'):
         result['url'] = expr
@@ -59,10 +58,12 @@ class WaveHandler(object):
         self.wavelet.CreateBlip().GetDocument().SetText('\n\nExecution error:\nHost: %s\nPath: %s\nError: %s' % data)
         FrameDisplay(self.blip,sess).display()
     except Exception, e:
-      doc.DeleteRange(document.Range(exec_pos,exec_pos + 2))
       self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % traceback.format_exc())
 
-  def handle_rset(self,rset_pos):
+  def handle_hash(self,hash):
+    pass
+
+  def handle_cmnd(self,cmnd):
     sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
     sess.frames = {}
     sess.save()
