@@ -3,6 +3,7 @@ import urllib
 from waveapi.simplejson import dumps
 
 from urquell.http import Module, Function, root
+from urquell.url import urlambda
 
 
 lib = Module(root, 'lib', """
@@ -87,7 +88,7 @@ def fn(server, *path, **kw):
     """
         <p>Constructs a function from a server name and a path.</p>
     """
-    return "http://%s/%s" % (server, path_args(path))
+    return repr(urlambda("http://%s/" % server, *path, **kw))
 Function(lib, fn, [
     'urquell-fn.appspot.com/lib/echo/',
     'urquell-fn.appspot.com/lib/echo/hello/%20/world',
@@ -101,13 +102,13 @@ def bind(f, *path, **kwargs):
         lib/call and lib/combinator/K.</p>
     """
     if f and len(path):
+        final = urlambda(f)
         for p in path:
-            v = urllib.quote(kwargs.get(p, '*'), '')
-            if f[-1] == '/':
-                f = '%s%s' % (f, v)
+            if kwargs.has_key(p):
+                final.path.append(kwargs[p])
             else:
-                f = '%s/%s' % (f, v)
-        return f
+                final.path.append(p)
+        return repr(final)
     elif f:
         return f
     else:
@@ -121,16 +122,8 @@ def call_trace(f, *path, **kwargs):
         <p>Execute a function and return all of the debugging information.</p>
     """
     from urquell.invocation import ErrorTrace, execute
-    query_string = '&'.join(['%s=%s' % (urllib.quote(k, '*/'), urllib.quote(v, '*/')) for k, v in kwargs.items()])
-    if len(path):
-        if f[-1] == '/':
-            f = '%s%s' % (f, path_args(path))
-        else:
-            f = '%s/%s' % (f, path_args(path))
-    if query_string:
-        return execute('%s?%s' % (f, query_string))
-    else:
-        return execute(f)
+    url = urlambda(f, *path, **kwargs)
+    return execute(repr(url))
 Function(lib, call_trace, [
     '*LsRUxMs0/Hello%20world',
     '*N698-V54/lib',

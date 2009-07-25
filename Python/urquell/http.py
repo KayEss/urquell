@@ -19,8 +19,9 @@ class Responder(webapp.RequestHandler):
         self.context = {}
         self.status = 200
         try:
-            #path = [resolve_part(str(i))[1] for i in self.request.path[1:].split('/')]
-            root.get(self, *self.request.path[1:].split('/'))
+            path = [resolve_part(str(i))[1] for i in self.request.path[1:].split('/')]
+            kwargs = dict([(resolve_part(k), resolve_part(v)) for k, v in self.request.GET])
+            root.get(self, *path, **kwargs)
         except ErrorTrace, e:
             self.status = 500
             self.object['error'] = {
