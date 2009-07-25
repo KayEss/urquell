@@ -68,6 +68,10 @@ class URLParsing(unittest.TestCase):
         self.roundtrip('http://www.example.com/%5B%22hello%22%5D', 'http://www.example.com/', ["hello"])
         self.roundtrip('http://www.example.com/%5B%22hello%22%2C%2030%5D', 'http://www.example.com/', ["hello", 30])
 
+    def test_representation_object(self):
+        self.roundtrip('http://www.example.com/%7B%7D', 'http://www.example.com/', {})
+        self.roundtrip('http://www.example.com/%7B%22k%22%3A%20%22v%22%7D', 'http://www.example.com/', dict(k='v'))
+
     def roundtrip(self, stringed, prefix, *path, **kwargs):
         """
             This abstracted test checks that we have proper round trips for various kinds of URL
