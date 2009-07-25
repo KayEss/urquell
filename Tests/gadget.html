@@ -2,13 +2,17 @@
     <body>
         <p>This page is a simple host of the gadget JavaScript.</p>
 
-        <script type="text/javascript" src="../Python/assets/jquery-1.3.2.min.js"></script>
-        <div id="lurquell">
-            <div>This is the lurquell robot. Apparently the JavaScript isn't working properly though.</div>
+        <div style="border: 1px solid red">
+            <script type="text/javascript" src="../Python/assets/jquery-1.3.2.min.js"></script>
+            <div id="lurquell">
+                <div>
+                    This is the lurquell robot. Apparently the JavaScript support in your browser isn't working properly though.
+                </div>
+            </div>
+            <script type="text/javascript">
+                $('#lurquell').text("Starting to load the gadget. Please wait...");
+            </script>
+            <script type="text/javascript" src="../Python/assets/lurquell.js"></script>
         </div>
-        <script>
-            $('#lurquell').find('div').text("Starting to load the gadget. Please wait...");
-        </script>
-        <script type="text/javascript" src="../Python/assets/lurquell.js"></script>
     </body>
 </html>
