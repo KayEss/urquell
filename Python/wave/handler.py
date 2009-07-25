@@ -16,9 +16,10 @@ class WaveHandler(object):
   def on_robot_added(self,properties, context):
     """Invoked when the robot has been added."""
     doc = context.GetRootWavelet().CreateBlip().GetDocument()
-    welcome = "Urquell calling - !x to execute !reset to reset session."
-    doc.SetText(welcome)
-    doc.InsertElement(len(welcome),document.Gadget('http://urquell-fn.appspot.com/assets/wave-gadget.xml'))
+    doc.SetText("\nLurquell calling - I understand:\nurls (http://urquell-fn.appspot.com/lib)\nhashes (*Wv6HOMv4)\ncommands (!reset)")
+    doc = context.GetRootWavelet().CreateBlip().GetDocument()
+    doc.SetText('Lurquell gadget ')
+    doc.InsertElement(15,document.Gadget('http://urquell-fn.appspot.com/assets/wave-gadget.xml'))
 	
   def on_blip_submitted(self,properties, context):
     blipid = properties['blipId']
@@ -50,7 +51,7 @@ class WaveHandler(object):
         sess.frames[result['hash']] = result
         sess.save()
         FrameDisplay(self.blip,sess).display()
-        doc.AppendText('\n%s' % result['hash'])
+        doc.AppendText('\nhttp://urquell-fn.appspot.com/lib %s' % result['hash'])
       elif result and result.has_key('value'):
         ModuleDisplay(self.blip,sess).display(result)
         doc.AppendText('\n%s' % expr)
