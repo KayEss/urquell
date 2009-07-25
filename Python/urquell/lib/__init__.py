@@ -90,7 +90,7 @@ def fn(server, *path, **kw):
     """
     return repr(urlambda("http://%s/" % server, *path, **kw))
 Function(lib, fn, [
-    'urquell-fn.appspot.com/lib/echo/',
+    'urquell-fn.appspot.com/lib/echo',
     'urquell-fn.appspot.com/lib/echo/hello/%20/world',
     'urquell-fn.appspot.com/lib/add/1',
 ])
