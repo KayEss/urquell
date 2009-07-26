@@ -1,17 +1,28 @@
 
+
 lurquell = new function () {
+    /*
+        Detects whether or not we're in a wave
+    */
+    in_wave = function() {
+        try {
+            return wave && wave.isInWaveContainer();
+        } catch (e) {
+            return false;
+        }
+    }();
     /*
         Builds the select box for a single level. This only works for modules as functions must be handled differently.
     */
     function level_builder(json, level) {
-        function option_builder(name) {
-            return $('<option value="' + name + '">').text(name)
+        function option_builder(name, is_function) {
+            return $('<option value="' + name + '" class="' + (is_function ? 'function' : 'module') + '">').text(name)
         }
         var opts = $('<select id="urquell_select_' + level + '">').append(
             $('<option value="">').text( level ? "<null>" : "")
         );
-        for ( var o in json.value.modules )
-            opts = opts.append(option_builder(json.value.modules[o].name))
+        for (var o in json.value.modules)
+            opts = opts.append(option_builder(json.value.modules[o].name, false))
         return opts;
     }
     /*
@@ -26,7 +37,12 @@ lurquell = new function () {
         Shows a command and its current status in the status bar
     */
     function status_text(command, status) {
-        replace_content('urquell_status').append(
+        var content = replace_content('urquell_status');
+        if ( !this.in_wave )
+            content = content.append(
+                $('<b>').text("Not in wave -- ")
+            )
+        return content.append(
             $('<span>').text(command)
         ).append(
             $('<span>').text(' -- ')
