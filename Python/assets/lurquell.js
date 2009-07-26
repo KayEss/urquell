@@ -1,9 +1,7 @@
 
-$('#lurquell').text("Gadget loaded. Requesting information from the Urquell server. Please wait...");
-
 lurquell = new function () {
     /*
-        Builds the select box for a single level. This only works for modules.
+        Builds the select box for a single level. This only works for modules as functions must be handled differently.
     */
     function level_builder(json, level) {
         function option_builder(name) {
@@ -17,12 +15,42 @@ lurquell = new function () {
         return opts;
     }
     /*
+        Takes a div ID and returns the newly empty div
+    */
+    function replace_content(id) {
+        var inner_div = $('<div id="' + id + '">');
+        $('#' + id).replaceWith(inner_div);
+        return inner_div;
+    }
+    /*
+        Shows a command and its current status in the status bar
+    */
+    function status_text(command, status) {
+        replace_content('urquell_status').append(
+            $('<span>').text(command)
+        ).append(
+            $('<span>').text(' -- ')
+        ).append(
+            $('<b>').text(status)
+        );
+    }
+    /*
+        Execute the provided Urquell command. The command executes asynchronously.
+    */
+    function execute_command(command, lambda) {
+        status_text(command, "starting");
+        $.getJSON(command+'?__=?', function(json) {
+            status_text(command, "complete");
+            return lambda(json);
+        });
+    }
+    /*
         Called to reset the gadget for the beginning of a line
     */
     this.start_line = function () {
-        $.getJSON("http://urquell-fn.appspot.com/?__=?", function(json) {
-            $('#lurquell').replaceWith(
-                $('<div id="urquell">').append(
+        execute_command("http://urquell-fn.appspot.com/", function(json) {
+            $('#urquell_builder').replaceWith(
+                $('<div id="urquell_builder">').append(
                     $('<span id="urquell_server"></span>').text("http://urquell-fn.appspot.com/")
                 ).append(
                     level_builder(json, 0)
@@ -32,9 +60,11 @@ lurquell = new function () {
                     $('<input type="submit" value="Execute">')
                 )
             );
-        })
+        });
     }
     return this;
 }
+
+$('#urquell_builder').text("Gadget loaded. Requesting information from the Urquell server. Please wait...");
 
 lurquell.start_line();
