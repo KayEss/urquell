@@ -66,6 +66,9 @@ lurquell = new function () {
         for ( element = element.prev(); element[0].tagName.toLowerCase() == "select"; element = element.prev() )
             if (element[0].value)
                 path = escape(element[0].value) + ( !path.length ? "" : "/" + path );
+        var query = $('#urquell_query')[0].value;
+        if ( query )
+            path += '?' + query
         if ( this.in_wave ) {
             // TODO Send this to the robot for evaluation
             alert("http://urquell-fn.appspot.com/" + path);
@@ -83,6 +86,10 @@ lurquell = new function () {
                 level_builder(json, 0)
             ).append(
                 $('<input type="text" id="urquell_path">')
+            ).append(
+                $('<span>').text('?')
+            ).append(
+                $('<input type="text" id="urquell_query">')
             ).append(
                 $('<input type="submit" value="Execute" onclick="lurquell.execute()">')
             )
