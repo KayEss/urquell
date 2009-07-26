@@ -4,13 +4,13 @@ lurquell = new function () {
     /*
         Detects whether or not we're in a wave
     */
-    in_wave = function() {
+    $(document).ready(function() {
         try {
-            return wave && wave.isInWaveContainer();
+            lurquell.in_wave = wave && wave.isInWaveContainer();
         } catch (e) {
-            return false;
+            lurquell.in_wave = false;
         }
-    }();
+    });
     /*
         Builds the select box for a single level.
     */
@@ -38,7 +38,7 @@ lurquell = new function () {
     */
     function status_text(command, status) {
         var content = replace_content('urquell_status');
-        if ( !this.in_wave )
+        if ( !lurquell.in_wave )
             content = content.append(
                 $('<b>').text("Not in wave -- ")
             )
@@ -100,4 +100,4 @@ lurquell = new function () {
 
 $('#urquell_builder').text("Gadget loaded. Requesting information from the Urquell server. Please wait...");
 
-lurquell.start_line();
+$(document).ready(lurquell.start_line);
