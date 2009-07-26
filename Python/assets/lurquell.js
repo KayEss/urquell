@@ -12,7 +12,7 @@ lurquell = new function () {
         }
     }();
     /*
-        Builds the select box for a single level. This only works for modules as functions must be handled differently.
+        Builds the select box for a single level.
     */
     function level_builder(json, level) {
         function option_builder(name, is_function) {
@@ -60,22 +60,32 @@ lurquell = new function () {
             return lambda(json);
         });
     }
+    this.execute = function() {
+        var element = $('#urquell_path');
+        var path = escape(element[0].value);
+        for ( element = element.prev(); element[0].tagName.toLowerCase() == "select"; element = element.prev() )
+            if (element[0].value)
+                path = escape(element[0].value) + ( !path.length ? "" : "/" + path );
+        if ( this.in_wave ) {
+            // TODO Send this to the robot for evaluation
+            alert("http://urquell-fn.appspot.com/" + path);
+        } else
+            alert("In a wave this would send the following to the robot for evaluation\nhttp://urquell-fn.appspot.com/" + path);
+    }
     /*
         Called to reset the gadget for the beginning of a line
     */
     this.start_line = function () {
         execute_command("http://urquell-fn.appspot.com/", function(json) {
-            $('#urquell_builder').replaceWith(
-                $('<div id="urquell_builder">').append(
-                    $('<span id="urquell_server"></span>').text("http://urquell-fn.appspot.com/")
-                ).append(
-                    level_builder(json, 0)
-                ).append(
-                    $('<input type="text" name="path">')
-                ).append(
-                    $('<input type="submit" value="Execute">')
-                )
-            );
+            replace_content('urquell_builder').append(
+                $('<span id="urquell_server"></span>').text("http://urquell-fn.appspot.com/")
+            ).append(
+                level_builder(json, 0)
+            ).append(
+                $('<input type="text" id="urquell_path">')
+            ).append(
+                $('<input type="submit" value="Execute" onclick="lurquell.execute()">')
+            )
         });
     }
     return this;
