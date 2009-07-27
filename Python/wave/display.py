@@ -20,17 +20,22 @@ class Display(object):
 		
 class FrameDisplay(Display):
 	def display(self):
-		output = ''
-		hr_ranges = []
-		header_len = len(self.doc.GetText())
-		format = u'%s\n%s\n  Hash: %s   Result: %s\n  Name: %s   Args: %s\n'
+		s = Style()
+		output = AnnotatedString(len(self.doc.GetText()))
 		for f in self.session.ordered_frames():
-			pos = header_len + len(output)
-			hr_ranges.append(document.Range(pos,(pos + len(self.hr))))
-			data = self.hr,f['url'],f.get('hash','None'), self.session.get_result(f), f['name'], ', '.join(f.get('args',''))
-			output += (format % data)
-		self.doc.AppendText(output + self.hr + '\n')
-		for r in hr_ranges[1:]: self.doc.SetAnnotation(r,'style/color','rgb(182, 182, 182)')
+			color = (s.red if self.session.is_error(f) else s.gray)
+			output.a('%s\n%s\n' % (self.hr,f['url']),[s.lightGray])
+			output.a('Hash: ',[color,s.bold])
+			output.a('%s   ' % f.get('hash','None'),[s.gray])
+			output.a('Result: ',[color,s.bold])
+			output.a('%s\n' % self.session.get_result(f),[s.gray])
+			output.a('Name: ',[color,s.bold])
+			output.a('%s   ' % f['name'],[s.gray])
+			output.a('Args: ',[color,s.bold])
+			output.a('%s\n' % ', '.join(f.get('args','')),[s.gray])
+		output.a(self.hr + '\n',[s.lightGray])
+		self.doc.AppendText(output.string)
+		output.apply(self.doc)
 
 class ModuleDisplay(Display):
 	def display(self,frame):
@@ -53,11 +58,11 @@ class ModuleDisplay(Display):
 class AnnotatedString(object):
 	string = ''
 	offset = 0
-	notes = []
+	notes = None
 
 	def __init__(self,offset = 0):
-		self.offset = offset
-		
+		self.offset,self.notes = offset,[]
+
 	def a(self,string,notes = None):
 		if not notes: 
 			self.string += string
@@ -74,9 +79,9 @@ class AnnotatedString(object):
 class Style(object):
 	bold = ('style/fontWeight','bold')
 	underline = ('style/fontDecoration','underline')
-	gray = ('style/color','rgb(92, 92, 92)')
+	gray = ('style/color','rgb(82, 82, 82)')
 	lightGray = ('style/color','rgb(192, 192, 192)')
 	green = ('style/color','rgb(0, 51, 0)')
-	red = ('style/color','rgb(102, 51, 51)')
+	red = ('style/color','rgb(152, 51, 51)')
 
 	def color(self,values): return ('style/color',('rgb(%s)' % values))
