@@ -58,7 +58,6 @@ class WaveHandler(object):
       elif result and result.has_key('error'):
         data = result['headers']['Host'],result['path'],result['error']['message']
         self.wavelet.CreateBlip().GetDocument().SetText('\n\nExecution error:\nHost: %s\nPath: %s\nError: %s' % data)
-        FrameDisplay(self.blip,sess).display()
     except Exception, e:
       self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % traceback.format_exc())
 
