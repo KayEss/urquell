@@ -5,6 +5,7 @@ from urquell.invocation import execute
 from wave.session import SessionWrapper
 from wave.display import FrameDisplay
 from wave.display import ModuleDisplay
+from wave.display import HelpDisplay
 import traceback
 
 class WaveHandler(object):
@@ -16,7 +17,7 @@ class WaveHandler(object):
   def on_robot_added(self,properties, context):
     """Invoked when the robot has been added."""
     doc = context.GetRootWavelet().CreateBlip().GetDocument()
-    doc.SetText("\nLurquell calling - I understand:\nurls (http://urquell-fn.appspot.com/lib)\nhashes (*Wv6HOMv4)\ncommands (!reset)")
+    doc.SetText("\nLurquell calling - !help for help")
     doc = context.GetRootWavelet().CreateBlip().GetDocument()
     doc.SetText('Lurquell gadget ')
     doc.InsertElement(15,document.Gadget('http://urquell-fn.appspot.com/assets/wave-gadget.xml'))
@@ -75,8 +76,17 @@ class WaveHandler(object):
       self.wavelet.CreateBlip().GetDocument().SetText('\n\nException thrown:\n%s' % traceback.format_exc())
 	
   def handle_cmnd(self,cmnd):
+    sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
     if cmnd == '!reset':
-      sess = SessionWrapper(self.blip.GetId() + self.wave.GetId())
       sess.frames = {}
-      sess.save()
-    FrameDisplay(self.blip,sess).display()    
+    # if cmnd == '!content errors':
+    #   sess.settings['content'] = '__errors__'
+    # if cmnd == '!content all':
+    #   sess.settings['content'] = '__all__'
+    # if cmnd.startswith('!filter'):
+    #   sess.settings['content'] = cmnd.split(' ')[1]
+    if cmnd == '!help':
+      HelpDisplay(self.blip,sess).display()
+      return
+    sess.save()
+    FrameDisplay(self.blip,sess).display()

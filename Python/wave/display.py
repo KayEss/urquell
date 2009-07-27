@@ -55,7 +55,22 @@ class ModuleDisplay(Display):
 		output.a(self.hr + '\n',[s.lightGray])
 		self.doc.AppendText(output.string)
 		output.apply(self.doc)
-		
+
+class HelpDisplay(Display):
+	def display(self):
+		s = Style()
+		output = AnnotatedString(len(self.doc.GetText()))
+		output.a('\nLurquell, an Urquell assistant\n\n',[s.red,s.bold])
+		output.a("Lurquell aims to make writing programs in Urquell a reasonable endeavor. It does so by managing a collection of Urquell expressions in a session, and facilitating their perusal, manipulation, and composition. Lurquell evaluates the last line of a blip upon submission, and redisplays the modified session data. Interacting with Lurquell falls in the following pattern: ctrl-e to begin editing a blip, type,copy, paste input on the last line of the blip, shift-enter to submit the blip. rinse, repeat. Three types of input are understood:\n\n",[s.gray])
+		output.a('Urquell expressions\n\n',[s.green,s.bold])
+		output.a("All expressions in an Urquell program are URL's which return a JSON string representing the result of their evaluation. for example: http://urquell-fn.appspot.com/lib/echo/hello%20world. Lurquell collects the result of each evaluated URL in a Session attached to the blip in which it was submitted. An Urquell URL has been placed on the last line of this blip to get you started.\n\n",[s.gray])
+		output.a('Urquell invocation hashes\n\n',[s.green,s.bold])
+		output.a("The result of evaluating each Urquell expression contains an invocation hash. This hash can be used to reference the return value of the URL. These hashes are composed of 8 characters preceeded by a '*'. eg. *B5_YIEPO. If provided as input to Lurquell, the hash well be derefernced, and its associated Urquell expression displayed.\n\n",[s.gray])
+		output.a('Lurquell commands\n\n',[s.green,s.bold])		
+		output.a("Currently two commands are implemented: !reset clears the current session data. !help displays this help text\n\n",[s.gray])
+		self.doc.AppendText(output.string + 'http://urquell-fn.appspot.com/lib')
+		output.apply(self.doc)
+
 class AnnotatedString(object):
 	string = ''
 	offset = 0
