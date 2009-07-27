@@ -36,17 +36,17 @@ class ModuleDisplay(Display):
 	def display(self,frame):
 		s = Style()
 		output = AnnotatedString(len(self.doc.GetText()))
-		output.a(self.hr)
-		output.a(('\nModule: %s\n' % frame['path']),[s.color('102, 51, 51'),s.bold,s.uline])
+		output.a(self.hr,[s.lightGray])
+		output.a(('\nModule: %s\n' % frame['path']),[s.red,s.bold,s.underline])
 		if frame['value']['modules']:
-			output.a(('\n%s\n    ' % 'Submodules:'),[s.color('0, 51, 0'),s.bold])
 			names = map(lambda x: x['name'], frame['value']['modules'])
-			output.a('    '.join(names),[s.color('92, 92, 92')])
+			output.a(('\n%s\n' % 'Submodules:'),[s.green,s.bold])
+			output.a('    '.join(names),[s.gray])
 		if frame['value']['functions']:
-			output.a(('\n%s\n    ' % 'Functions:'),[s.color('0, 51, 0'),s.bold])
 			names = map(lambda x: x['name'], frame['value']['functions'])
-			output.a('    '.join(names) + '\n',[s.color('92, 92, 92')])
-		output.a(self.hr + '\n')
+			output.a(('\n%s\n' % 'Functions:'),[s.green,s.bold])
+			output.a('    '.join(names) + '\n',[s.gray])
+		output.a(self.hr + '\n',[s.lightGray])
 		self.doc.AppendText(output.string)
 		output.apply(self.doc)
 		
@@ -73,7 +73,10 @@ class AnnotatedString(object):
 		
 class Style(object):
 	bold = ('style/fontWeight','bold')
-	uline = ('style/fontDecoration','underline')
+	underline = ('style/fontDecoration','underline')
+	gray = ('style/color','rgb(92, 92, 92)')
+	lightGray = ('style/color','rgb(192, 192, 192)')
+	green = ('style/color','rgb(0, 51, 0)')
+	red = ('style/color','rgb(102, 51, 51)')
+
 	def color(self,values): return ('style/color',('rgb(%s)' % values))
-	def bgcolor(self,values): return ('style/backgroundColor',('rgb(%s)' % values))
-	def link(self,target): return ('link/auto',target)
