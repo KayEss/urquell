@@ -16,6 +16,7 @@ class Display(object):
 		if not self.blip.IsRoot(): text += ' \n'
 		text += 'Urquell Session'
 		self.doc.AppendText('%s - %s\n' % (text,self.session.data.created.strftime('%Y.%m.%d - %H:%M')))
+		self.doc.AppendText('Frames: %s    Errors: %s    Display: frames\n' % (len(session.frames),len(session.errors())))
 		self.doc.SetAnnotation(document.Range(1,len(text)),'style/fontWeight','bold')
 		
 class FrameDisplay(Display):
