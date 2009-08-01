@@ -37,6 +37,10 @@ Function(http, get, [
 ])
 
 def post(url, **kwargs):
+    """
+        <p>Does a HTTP post on the specified URL and returns the response. This will only return the body text if the resource is text. Post variables can be specified in the query string.</p>
+        <p>Handles poorly formed headers, where an encoding isn't specified, or the header name is the incorrect case.</p>
+    """
     if url:
         post_vars = '&'.join(['%s=%s' % (i[0],i[1]) for i in kwargs.items()])
         response = fetch(url, deadline=10, method='POST', payload=post_vars)
@@ -59,6 +63,7 @@ def post(url, **kwargs):
     else:
 	    return None
 Function(http, post, [
+    "*Hp6Aes1R"
 ])
 
 def headers(url, **kwargs):
