@@ -111,6 +111,13 @@ class Contained(EndPoint):
     def path(self):
         return "%s/%s" % (self.container.path(), self.name)
 
+    def breadcrumb(self):
+        names = [x for x in self.container.path().split('/') if x != '']
+        paths = [ '/' + '/'.join(names[0:x]) for x in range(len(names),0,-1) ]
+        paths.reverse()
+        return zip(names,paths)
+
+
 class Module(Contained):
     def __init__(self, smodule, name, description):
         super(Module, self).__init__(smodule, name, description)
@@ -133,6 +140,7 @@ class Module(Contained):
             responder.context = dict(
                 module = self,
                 description = self.description,
+                breadcrumb = self.breadcrumb()
             )
         else:
             self.route(responder, *path, **kwargs)
@@ -146,4 +154,5 @@ class Function(Contained):
 
     def get(self, responder, *path, **kwargs):
         responder.context['function'] = self
+        responder.context['breadcrumb'] = self.breadcrumb()
         invoke(responder, self.container, self.fn, *path, **kwargs)

@@ -2,6 +2,15 @@
 
 {% block content %}
 
+    <div class='Breadcrumb'>
+        <a href='/'>home</a> 
+        {% for crumb in breadcrumb %}
+            &gt; <a href="{{ crumb.1 }}">{{ crumb.0 }}</a>
+        {% endfor %}
+    </div>
+
+{{ module }}
+
     <h1>{{ module.name }}</h1>
         {{ description }}
 

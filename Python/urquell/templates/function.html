@@ -2,6 +2,13 @@
 
 {% block content %}
 
+    <div class='Breadcrumb'>
+        <a href='/'>home</a> 
+        {% for crumb in breadcrumb %}
+            &gt; <a href="{{ crumb.1 }}">{{ crumb.0 }}</a>
+        {% endfor %}
+    </div>
+
     <h1>{{ function.name }}</h1>
         {{ function.description }}
 
@@ -9,7 +16,7 @@
     <dl>
         <dt>HTTP status code</dt>
             <dd>{{ status }}</dd>
-        {% if error %}
+        {% if error %}	
             <dt>Error</dt>
                 <dd class="Error">{{ error.message|escape }}</dd>
             {% if error.python %}
