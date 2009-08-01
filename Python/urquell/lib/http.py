@@ -36,6 +36,31 @@ Function(http, get, [
     '*zmHOYaYg'
 ])
 
+def post(url, **kwargs):
+    if url:
+        post_vars = '&'.join(['%s=%s' % (i[0],i[1]) for i in kwargs.items()])
+        response = fetch(url, deadline=10, method='POST', payload=post_vars)
+        headers = dict([(k.lower(),v) for k, v in response.headers.items()])
+        content_type = headers.get('content-type', ';').split(';')
+        mime = content_type[0]
+        charset = (content_type[1].split('=')[1] if len(content_type) > 1 else 'utf-8')
+        if mime.startswith('text/'):
+            return dict(
+                status = response.status_code,
+                body = response.content.decode(charset),
+                headers = headers
+            )
+        else:
+            return dict(
+                status = response.status_code,
+                body = None,
+                headers = headers
+            )
+    else:
+	    return None
+Function(http, post, [
+])
+
 def headers(url, **kwargs):
     """
         <p>Returns only the HTTP headers for a request performed through HEAD request.</p>
