@@ -5,7 +5,7 @@
     <div class='Breadcrumb'>
         <a href='/'>home</a> 
         {% for crumb in breadcrumb %}
-            &gt; <a href="{{ crumb.1 }}">{{ crumb.0 }}</a>
+            / <a href="{{ crumb.1 }}">{{ crumb.0 }}</a>
         {% endfor %}
     </div>
 

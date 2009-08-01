@@ -4,7 +4,7 @@ body {
 	color: #000;
 	font-family: Verdana, sans-serif;
 	font-size: 1.0em;
-	background: #f3f3f3;
+	background: #f7f7f7;
 }
 
 h1 {
@@ -17,7 +17,7 @@ h2 {
 }
 
 a {
-	color: #a22;
+	color: #00a;
 	text-decoration: none;
 }
 
@@ -55,4 +55,15 @@ div.Badge {
 
 DIV.Notice {
 	margin-left: 325px;
+}
+
+.Error {
+	color : #a22;
+}
+
+pre {
+	background: #fff;
+	padding: 5px;
+	border: 1px dotted #333;
+	font-family: Ariel, sans-serif;
 }
